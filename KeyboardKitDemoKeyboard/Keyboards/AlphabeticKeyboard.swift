@@ -7,6 +7,7 @@
 //
 
 import KeyboardKit
+import UIKit
 
 /**
  This demo keyboard mimicks an English alphabetic keyboard.
@@ -19,8 +20,30 @@ struct AlphabeticKeyboard: DemoKeyboard {
             in: viewController)
     }
 
-    let actions: KeyboardActionRows
+    var actions: KeyboardActionRows
+    
+    static func bottomActions(uppercased: Bool, in vc: KeyboardViewController) -> KeyboardActionRows {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return [[
+                .nextKeyboard,
+                .keyboardType(.numeric),
+                .shift(currentState: uppercased ? .uppercased : .lowercased),
+                .space,
+                .keyboardType(.symbolic),
+                .moveCursorBackward,
+                .moveCursorForward
+            ]]
+        } else {
+            return [[
+                .keyboardType(.numeric),
+                .shift(currentState: uppercased ? .uppercased : .lowercased),
+                .space,
+                .keyboardType(.symbolic)
+            ]]
+        }
+    }
 }
+
 
 private extension AlphabeticKeyboard {
     
@@ -29,32 +52,54 @@ private extension AlphabeticKeyboard {
         in viewController: KeyboardViewController) -> KeyboardActionRows {
         KeyboardActionRows(characters: characters(uppercased: uppercased))
             .addingSideActions(uppercased: uppercased)
-            .appending(bottomActions(leftmost: switchAction, for: viewController))
     }
     
-    static let characters: [[String]] = [
-        ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
-        ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
-        ["z", "x", "c", "v", "b", "n", "m"]
-    ]
+    static func keys(uppercased: Bool) -> [[KeyboardAction]] {
+        return [
+        [
+            .character("Q"),
+            .character("W"),
+        ]
+        ]
+    }
     
     static func characters(uppercased: Bool) -> [[String]] {
-        uppercased ? characters.uppercased() : characters
-    }
-    
-    static var switchAction: KeyboardAction {
-        .keyboardType(.numeric)
+        if uppercased {
+        
+        return  [["Q", "W", "F", "P", "G", "J", "L", "U", "Y"],
+                 ["A", "R", "S", "T", "D", "H", "N", "E", "I", "O"],
+                 ["Z", "X", "C", "V", "B", "K", "M", "!", "?"]]
+        } else {
+        return  [["q", "w", "f", "p", "g", "j", "l", "u", "y"],
+                 ["a", "r", "s", "t", "d", "h", "n", "e", "i", "o"],
+                 ["z", "x", "c", "v", "b", "k", "m", ",", "'"]]
+        }
     }
 }
 
 private extension Sequence where Iterator.Element == KeyboardActionRow {
     
     func addingSideActions(uppercased: Bool) -> [Iterator.Element] {
-        var result = map { $0 }
-        result[2].insert(uppercased ? .shift(currentState: .uppercased) : .shift(currentState: .lowercased), at: 0)
-        result[2].insert(.none, at: 1)
-        result[2].append(.none)
-        result[2].append(.backspace)
-        return result
+        var actions = map { $0 }
+//        actions[2].insert(.keyboardType(.symbolic), at: 0)
+//        actions[2].insert(.none, at: 1)
+//        actions[2].append(.none)
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            actions[0].insert(.tab, at: 0)
+            actions[1].insert(.character("-"), at: 0)
+            actions[2].insert(.escape, at: 0)
+            if uppercased {
+                actions[0].append(.character(":"))
+                actions[1].append(.character("`"))
+                actions[2].append(.character("@"))
+            } else {
+                actions[0].append(.character(";"))
+                actions[1].append(.character("'"))
+                actions[2].append(.character("/"))
+            }
+        }
+        actions[0].append(.backspace)
+        actions[2].append(.newLine)
+        return actions
     }
 }

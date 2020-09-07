@@ -40,6 +40,12 @@ class KeyboardViewController: KeyboardInputViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         context.actionHandler = DemoKeyboardActionHandler(inputViewController: self)
+//        view.isUserInteractionEnabled = true
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        setNeedsUpdateOfScreenEdgesDeferringSystemGestures()
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -79,10 +85,8 @@ class KeyboardViewController: KeyboardInputViewController {
     
     let alerter = ToastAlert()
     
-    var emojiKeyboard: EmojiKeyboard?
-    var emojiCategoryTitleLabel = UILabel()
-    var emojiCollectionView: KeyboardButtonRowCollectionView!
-    var emojiLabelUpdateAction = {}
+    var bottomRow: [DemoButton] = []
+    var bottomRowThing: KeyboardStackViewComponent?
     
     
     // MARK: - Autocomplete
@@ -92,4 +96,38 @@ class KeyboardViewController: KeyboardInputViewController {
     lazy var autocompleteToolbar: AutocompleteToolbarView = {
         AutocompleteToolbarView(textDocumentProxy: textDocumentProxy)
     }()
+    
+    override func addKeyboardGestures(to button: KeyboardButton) {
+//        button.gestureRecognizers?.forEach { button.removeGestureRecognizer($0) }
+
+//        let gesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap2))
+//        gesture.numberOfTapsRequired = 2
+//        gesture.delegate = self
+//        button.addGestureRecognizer(gesture)
+        
+        if button.action == .nextKeyboard { return addNextKeyboardGesture2(to: button) }
+    }
+    
+    @objc func handleDoubleTap2(_ gesture: UIGestureRecognizer) {
+        guard let button = gesture.view as? KeyboardButton else { return }
+        context.actionHandler.handle(.doubleTap, on: button.action, sender: button)
+    }
+    
+    func addNextKeyboardGesture2(to button: KeyboardButton) {
+        guard let button = button as? UIButton else { return }
+        setupNextKeyboardButton(button)
+    }
+    
+    override var preferredScreenEdgesDeferringSystemGestures: UIRectEdge {
+        return [.left, .bottom, .right]
+    }
+    
+//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        print("touch")
+//        guard let locationPoint = touches.first?.location(in: view) else { return }
+//        let button = view.hitTest(locationPoint, with: event)
+//        print(button)
+//        button?.backgroundColor = .black
+//    }
+    
 }

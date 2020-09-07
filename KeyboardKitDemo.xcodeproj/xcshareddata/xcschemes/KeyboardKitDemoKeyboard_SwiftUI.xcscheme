@@ -57,8 +57,12 @@
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES"
       launchAutomaticallySubstyle = "2">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <RemoteRunnable
+         runnableDebuggingMode = "1"
+         BundleIdentifier = "com.apple.mobilenotes"
+         RemotePath = "/var/containers/Bundle/Application/F86960E3-F58C-4490-AD95-9B66524E487D/MobileNotes.app">
+      </RemoteRunnable>
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "84670444234A709400355331"
@@ -66,7 +70,7 @@
             BlueprintName = "KeyboardKitDemo"
             ReferencedContainer = "container:KeyboardKitDemo.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

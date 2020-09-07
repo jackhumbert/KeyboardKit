@@ -21,75 +21,68 @@ extension KeyboardViewController {
 private extension KeyboardViewController {
     
     func setupKeyboardAsync(for size: CGSize) {
-        keyboardStackView.removeAllArrangedSubviews()
+        if bottomRowThing != nil {
+            for view in keyboardStackView.arrangedSubviews {
+                if (view != bottomRowThing!) {
+                    keyboardStackView.removeArrangedSubview(view)
+                    view.removeFromSuperview()
+                }
+            }
+        } else {
+            keyboardStackView.removeAllArrangedSubviews()
+        }
         switch context.keyboardType {
         case .alphabetic(let state): setupAlphabeticKeyboard(for: state)
-        case .emojis: setupEmojiKeyboard(for: size)
-        case .images: setupImageKeyboard(for: size)
         case .numeric: setupNumericKeyboard()
         case .symbolic: setupSymbolicKeyboard()
         default: return
         }
     }
     
+    func setupBottomRow(rows: inout [KeyboardStackViewComponent], newBottomActions: KeyboardActionRows) {
+        if bottomRow.isEmpty {
+            let bottom = newBottomActions.map {
+                buttonRowBottom(for: $0, distribution: .fillProportionally)
+            }
+            bottomRowThing = bottom[0]
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                bottom[0].addConstraint(NSLayoutConstraint(item: bottom[0], attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 90))
+            }
+            rows.append(bottom[0])
+        } else {
+            for (index, button) in bottomRow.enumerated() {
+                button.setup(with: (newBottomActions as [[KeyboardAction]])[0][index], in: self, distribution: .fillProportionally)
+            }
+        }
+    }
+    
     func setupAlphabeticKeyboard(for state: KeyboardShiftState) {
         let keyboard = AlphabeticKeyboard(uppercased: state.isUppercased, in: self)
-        let rows = buttonRows(for: keyboard.actions, distribution: .fillProportionally)
-        keyboardStackView.addArrangedSubviews(rows)
+        var rows = buttonRows(for: keyboard.actions, distribution: .fillProportionally)
+        let newBottomActions = AlphabeticKeyboard.bottomActions(uppercased: state.isUppercased, in: self)
+        setupBottomRow(rows: &rows, newBottomActions: newBottomActions)
+        for (index, row) in rows.enumerated() {
+            keyboardStackView.insertArrangedSubview(row, at: index)
+        }
     }
-    
-    func setupEmojiKeyboard(for size: CGSize) {
-        let keyboard = EmojiKeyboard(in: self)
-        let config = keyboard.gridConfig
-        let view = KeyboardButtonRowCollectionView(id: "EmojiKeyboard", actions: keyboard.actions, configuration: config) { [unowned self] in return self.button(for: $0) }
-        let bottom = buttonRow(for: keyboard.bottomActions, distribution: .fillProportionally)
-        let label = emojiCategoryTitleLabel
-        emojiLabelUpdateAction = { label.text = keyboard.getCategory(at: view.persistedCurrentPageIndex)?.title ?? "" }
-        view.panGestureRecognizer.addTarget(self, action: #selector(refreshEmojiCategoryLabel(_:)))
-        keyboardStackView.addArrangedSubview(emojiCategoryTitleLabel)
-        keyboardStackView.addArrangedSubview(view)
-        keyboardStackView.addArrangedSubview(bottom)
-        emojiCollectionView = view
-        emojiKeyboard = keyboard
-        emojiLabelUpdateAction()
-    }
-    
-    func setupImageKeyboard(for size: CGSize) {
-        let keyboard = ImageKeyboard(in: self)
-        let view = KeyboardButtonRowCollectionView(actions: keyboard.actions, configuration: keyboard.gridConfig) { [unowned self] in return self.button(for: $0) }
-        let bottom = buttonRow(for: keyboard.bottomActions, distribution: .fillProportionally)
-        keyboardStackView.addArrangedSubview(view)
-        keyboardStackView.addArrangedSubview(bottom)
-    }
-    
+
     func setupNumericKeyboard() {
         let keyboard = NumericKeyboard(in: self)
-        let rows = buttonRows(for: keyboard.actions, distribution: .fillProportionally)
-        keyboardStackView.addArrangedSubviews(rows)
+        var rows = buttonRows(for: keyboard.actions, distribution: .fillProportionally)
+        let newBottomActions = NumericKeyboard.bottomActions(in: self)
+        setupBottomRow(rows: &rows, newBottomActions: newBottomActions)
+        for (index, row) in rows.enumerated() {
+            keyboardStackView.insertArrangedSubview(row, at: index)
+        }
     }
     
     func setupSymbolicKeyboard() {
         let keyboard = SymbolicKeyboard(in: self)
-        let rows = buttonRows(for: keyboard.actions, distribution: .fillProportionally)
-        keyboardStackView.addArrangedSubviews(rows)
-    }
-}
-
-
-// MARK: - Actions
-
-@objc extension KeyboardViewController {
-    
-    func refreshEmojiCategoryLabel() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: emojiLabelUpdateAction)
-    }
-    
-    /**
-     For now, this pan action handler delays updating, since
-     the gesture ends before the scroll view stops scrolling.
-     */
-    func refreshEmojiCategoryLabel(_ recognizer: UIPanGestureRecognizer) {
-        guard recognizer.state == .ended else { return }
-        refreshEmojiCategoryLabel()
+        var rows = buttonRows(for: keyboard.actions, distribution: .fillProportionally)
+        let newBottomActions = SymbolicKeyboard.bottomActions(in: self)
+        setupBottomRow(rows: &rows, newBottomActions: newBottomActions)
+        for (index, row) in rows.enumerated() {
+            keyboardStackView.insertArrangedSubview(row, at: index)
+        }
     }
 }

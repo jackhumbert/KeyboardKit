@@ -49,3 +49,9 @@ class KeyboardViewController: KeyboardInputViewController {
         context.actionHandler = DemoKeyboardActionHandler(inputViewController: self, toastContext: toastContext)
     }
 }
+
+struct KeyboardViewController_Previews: PreviewProvider {
+    static var previews: some View {
+        /*@START_MENU_TOKEN@*/Text("Hello, World!")/*@END_MENU_TOKEN@*/
+    }
+}

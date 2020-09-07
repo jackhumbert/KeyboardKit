@@ -7,6 +7,7 @@
 //
 
 import KeyboardKit
+import UIKit
 
 /**
  This protocol is used by the demo application keyboards and
@@ -16,15 +17,6 @@ import KeyboardKit
  functionality, like adapting to languages, device types etc.
  */
 protocol DemoKeyboard {}
-
-extension DemoKeyboard {
-    
-    static func bottomActions(leftmost: KeyboardAction, rightmost: KeyboardAction = .newLine, for vc: KeyboardViewController) -> KeyboardActionRow {
-        let actions = [leftmost, switchAction(for: vc), .space, imageAction(for: vc), .newLine]
-        let includeImageAction = vc.context.keyboardType.shouldIncludeImageAction
-        return includeImageAction ? actions : actions.withoutImageActions
-    }
-}
 
 private extension DemoKeyboard {
     

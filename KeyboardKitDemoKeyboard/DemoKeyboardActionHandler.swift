@@ -37,40 +37,67 @@ class DemoKeyboardActionHandler: StandardKeyboardActionHandler {
     
     override func longPressAction(for action: KeyboardAction, sender: Any?) -> GestureAction? {
         switch action {
-        case .image(_, _, let imageName): return { [weak self] in self?.saveImage(UIImage(named: imageName)!) }
         default: return super.longPressAction(for: action, sender: sender)
         }
     }
     
     override func tapAction(for action: KeyboardAction, sender: Any?) -> GestureAction? {
         switch action {
-        case .emojiCategory(let cat): return { [weak self] in self?.switchToEmojiKeyboardCategory(cat) }
-        case .image(_, _, let imageName): return { [weak self] in self?.copyImage(UIImage(named: imageName)!) }
         case .space: return handleSpace(for: sender)
+        case .shift(let currentState): return { [weak self] in
+            switch currentState {
+            case .lowercased: self?.inputViewController?.changeKeyboardType(to: .alphabetic(.uppercased))
+            case .uppercased: self?.inputViewController?.changeKeyboardType(to: .alphabetic(.lowercased))
+            case .capsLocked: self?.inputViewController?.changeKeyboardType(to: .alphabetic(.lowercased))
+            }
+        }
         default: return super.tapAction(for: action, sender: sender)
         }
     }
     
-    
     // MARK: - Action Handling
     
     override func handle(_ gesture: KeyboardGesture, on action: KeyboardAction, sender: Any?) {
-        super.handle(gesture, on: action, sender: sender)
+        guard let gestureAction = self.action(for: gesture, on: action, sender: sender) else { return }
+        gestureAction()
+            
+//        if UIDevice.current.userInterfaceIdiom == .pad {
+//            let buttonView = (sender as? DemoButton)?.buttonView
+//            let backgroundColor = buttonView?.backgroundColor
+//            UIView.animate(
+//                withDuration: 0.1,
+//                delay: 0,
+//                options: [.curveEaseOut, .allowUserInteraction],
+//                animations: { buttonView?.backgroundColor = .darkGray },
+//                completion: { (finished: Bool) in
+//                    buttonView?.backgroundColor = backgroundColor
+//                }
+//            )
+//        } else {
+//            var transform = CGAffineTransform(translationX: 0.0, y: -50.0)
+//            transform = transform.scaledBy(x: 1.1, y: 1.1)
+//            let buttonView = (sender as? DemoButton)?.buttonView
+//            let backgroundColor = buttonView?.backgroundColor
+//            UIView.animate(
+//                withDuration: 0.1,
+//                delay: 0,
+//                options: [.curveEaseOut, .allowUserInteraction],
+//                animations: {
+//                    buttonView?.transform = transform
+//                    buttonView?.backgroundColor = .darkGray
+//                },
+//                completion: { (finished: Bool) in
+//                    buttonView?.transform = .identity
+//                    buttonView?.backgroundColor = backgroundColor
+//                }
+//            )
+//        }
+//
+//        triggerHapticFeedback(for: gesture, on: action, sender: sender)
+        handleKeyboardSwitch(after: gesture, on: action)
         demoViewController?.requestAutocompleteSuggestions()
     }
 }
-
-
-// MARK: - Image Functions
-
-@objc extension DemoKeyboardActionHandler {
-    
-    func handleImage(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-        if error == nil { alert("Saved!") }
-        else { alert("Failed!") }
-    }
-}
-
 
 // MARK: - Actions
 
@@ -79,13 +106,6 @@ private extension DemoKeyboardActionHandler {
     func alert(_ message: String) {
         guard let input = inputViewController as? KeyboardViewController else { return }
         input.alerter.alert(message: message, in: input.view, withDuration: 4)
-    }
-    
-    func copyImage(_ image: UIImage) {
-        guard let input = inputViewController as? KeyboardViewController else { return }
-        guard input.hasFullAccess else { return alert("You must enable full access to copy images.") }
-        guard image.copyToPasteboard() else { return alert("The image could not be copied.") }
-        alert("Copied to pasteboard!")
     }
     
     /**
@@ -102,22 +122,4 @@ private extension DemoKeyboardActionHandler {
         }
     }
     
-    func saveImage(_ image: UIImage) {
-        guard let input = inputViewController as? KeyboardViewController else { return }
-        guard input.hasFullAccess else { return alert("You must enable full access to save images to photos.") }
-        let saveCompletion = #selector(handleImage(_:didFinishSavingWithError:contextInfo:))
-        image.saveToPhotos(completionTarget: self, completionSelector: saveCompletion)
-    }
-    
-    func switchToEmojiKeyboardCategory(_ cat: EmojiCategory) {
-        guard
-            let vc = demoViewController,
-            let view = vc.emojiCollectionView,
-            let keyboard = vc.emojiKeyboard,
-            let index = keyboard.getPageIndex(for: cat)
-            else { return }
-        view.currentPageIndex = index
-        view.persistCurrentPageIndex()
-        vc.emojiCategoryTitleLabel.text = cat.title
-    }
 }

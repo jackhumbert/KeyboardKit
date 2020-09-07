@@ -18,9 +18,23 @@ extension KeyboardViewController {
         return view
     }
     
+    func buttonBottom(for action: KeyboardAction, distribution: UIStackView.Distribution = .equalSpacing) -> UIView {
+        if action == .none { return KeyboardSpacerView(width: 10) }
+        let view = DemoButton.fromNib(owner: self)
+        view.setup(with: action, in: self, distribution: distribution)
+        bottomRow.append(view)
+        return view
+    }
+    
     func buttonRow(for actions: KeyboardActionRow, distribution: UIStackView.Distribution) -> KeyboardStackViewComponent {
         KeyboardButtonRow(actions: actions, distribution: distribution) {
             button(for: $0, distribution: distribution)
+        }
+    }
+    
+    func buttonRowBottom(for actions: KeyboardActionRow, distribution: UIStackView.Distribution) -> KeyboardStackViewComponent {
+        KeyboardButtonRow(actions: actions, distribution: distribution) {
+            buttonBottom(for: $0, distribution: distribution)
         }
     }
     
@@ -28,7 +42,13 @@ extension KeyboardViewController {
         var rows = actionRows.map {
             buttonRow(for: $0, distribution: distribution)
         }
-        rows.insert(autocompleteToolbar, at: 0)
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            for row in rows {
+                row.addConstraint(NSLayoutConstraint(item: row, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 90))
+            }
+        } else {
+            rows.insert(autocompleteToolbar, at: 0)
+        }
         return rows
     }
 }
