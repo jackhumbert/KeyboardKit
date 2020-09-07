@@ -87,6 +87,7 @@ class KeyboardViewController: KeyboardInputViewController {
     
     var bottomRow: [DemoButton] = []
     var bottomRowThing: KeyboardStackViewComponent?
+    public var currentKeys: [DemoButton] = []
     
     
     // MARK: - Autocomplete

@@ -17,16 +17,17 @@ import KeyboardKit
 class DemoButton: KeyboardButtonView {
 
     var buttonViewBackgroundColor: UIColor = .black
-    var vC : KeyboardInputViewController?
+    var vC : KeyboardViewController?
     var startTime: Date?
     var touching: Bool = false
     var timer: Timer?
     var repeated: Bool = false
+    var gR: UILongPressGestureRecognizer?
     
     open func setup(with action: KeyboardAction, in viewController: KeyboardInputViewController, distribution: UIStackView.Distribution = .fillEqually) {
         super.setup(with: action, in: viewController)
         
-        vC = viewController
+        vC = viewController as? KeyboardViewController
         backgroundColor = .clearInteractable
         buttonViewBackgroundColor = action.buttonColor(for: viewController)
         buttonView?.backgroundColor = buttonViewBackgroundColor
@@ -39,10 +40,10 @@ class DemoButton: KeyboardButtonView {
         width = action.buttonWidth(for: distribution)
         applyShadow(.standardButtonShadow)
         
-         if gestureRecognizers == nil {
-            let gr = UILongPressGestureRecognizer(target: self, action: #selector(handlePress))
-            gr.minimumPressDuration = 0.0
-            addGestureRecognizer(gr)
+         if gR == nil {
+            gR = UILongPressGestureRecognizer(target: self, action: #selector(handlePress))
+            gR!.minimumPressDuration = 0.0
+            addGestureRecognizer(gR!)
         }
     
         self.removeConstraints(self.constraints)
@@ -98,6 +99,18 @@ class DemoButton: KeyboardButtonView {
             touching = true
             repeated = false
             
+            for (index, k) in vC!.currentKeys.enumerated() {
+                switch k.action {
+                    case .character(_):
+                        k.gR?.isEnabled = false
+                        k.gR?.isEnabled = true
+                        break
+                    default:
+                        break
+                }
+            }
+            vC!.currentKeys.append(self)
+            
             let handler = vC?.context.actionHandler
             (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .tap, on: action, sender: self)
             (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .tap, on: action, sender: self)
@@ -148,9 +161,14 @@ class DemoButton: KeyboardButtonView {
             }
         }
         
-        if gesture.state == .ended {
+        if gesture.state == .ended || gesture.state == .cancelled {
         
             touching = false
+            for (index, k) in vC!.currentKeys.enumerated() {
+                if k == self {
+                    vC!.currentKeys.remove(at: index)
+                }
+            }
         
             if UIDevice.current.userInterfaceIdiom == .pad {
                 buttonView?.backgroundColor = buttonViewBackgroundColor
