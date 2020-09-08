@@ -64,15 +64,29 @@ private extension AlphabeticKeyboard {
     }
     
     static func characters(uppercased: Bool) -> [[String]] {
-        if uppercased {
-        
-        return  [["Q", "W", "F", "P", "G", "J", "L", "U", "Y"],
-                 ["A", "R", "S", "T", "D", "H", "N", "E", "I", "O"],
-                 ["Z", "X", "C", "V", "B", "K", "M", "!", "?"]]
+    
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            if uppercased {
+            
+            return  [["Q", "W", "F", "P", "G", "J", "L", "U", "Y"],
+                     ["A", "R", "S", "T", "D", "H", "N", "E", "I", "O"],
+                     ["Z", "X", "C", "V", "B", "K", "M", "!", "?"]]
+            } else {
+            return  [["q", "w", "f", "p", "g", "j", "l", "u", "y"],
+                     ["a", "r", "s", "t", "d", "h", "n", "e", "i", "o"],
+                     ["z", "x", "c", "v", "b", "k", "m", ",", "."]]
+            }
         } else {
-        return  [["q", "w", "f", "p", "g", "j", "l", "u", "y"],
-                 ["a", "r", "s", "t", "d", "h", "n", "e", "i", "o"],
-                 ["z", "x", "c", "v", "b", "k", "m", ",", "'"]]
+            if uppercased {
+            
+            return  [["Q", "W", "F", "P", "G", "J", "L", "U", "Y"],
+                     ["A", "R", "S", "T", "D", "H", "N", "E", "I", "O"],
+                     ["Z", "X", "C", "V", "B", "K", "M", "!", "?"]]
+            } else {
+            return  [["q", "w", "f", "p", "g", "j", "l", "u", "y"],
+                     ["a", "r", "s", "t", "d", "h", "n", "e", "i", "o"],
+                     ["z", "x", "c", "v", "b", "k", "m", ",", "'"]]
+            }
         }
     }
 }

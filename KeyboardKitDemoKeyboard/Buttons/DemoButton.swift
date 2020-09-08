@@ -48,12 +48,15 @@ class DemoButton: KeyboardButtonView {
     
         self.removeConstraints(self.constraints)
         
-        self.addConstraint(NSLayoutConstraint(item:self, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: -3))
-        self.addConstraint(NSLayoutConstraint(item:self, attribute: .top, relatedBy: .equal, toItem: buttonView!, attribute: .top, multiplier: 1, constant: -3))
-        self.addConstraint(NSLayoutConstraint(item:self, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: 3))
-        self.addConstraint(NSLayoutConstraint(item:self, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: 3))
+
         
         if UIDevice.current.userInterfaceIdiom == .pad {
+            self.addConstraints([
+                NSLayoutConstraint(item:self, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: -7),
+                NSLayoutConstraint(item:self, attribute: .top, relatedBy: .equal, toItem: buttonView!, attribute: .top, multiplier: 1, constant: -7),
+                NSLayoutConstraint(item:self, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: 7),
+                NSLayoutConstraint(item:self, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: 7)
+            ])
             switch action {
                 case .keyboardType(.alphabetic(.lowercased)):
                     if viewController.context.keyboardType == .numeric {
@@ -63,17 +66,14 @@ class DemoButton: KeyboardButtonView {
                         self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: -8))
                         self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -6))
                     }
-                    break
                 case .tab, .escape, .shift(_), .keyboardType(.numeric), .nextKeyboard:
                     self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: 8))
                     self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -6))
                     self.addConstraint(NSLayoutConstraint(item: image!, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: 8))
                     self.addConstraint(NSLayoutConstraint(item: image!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -6))
-                    break
                 case .backspace, .newLine, .keyboardType(.symbolic), .moveCursorForward, .moveCursorBackward:
                     self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: -8))
                     self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -6))
-                    break
                 default:
                     self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .centerX, relatedBy: .equal, toItem: buttonView! , attribute: .centerX, multiplier: 1, constant: 0))
                     self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .centerY, relatedBy: .equal, toItem: buttonView!, attribute: .centerY, multiplier: 1, constant: -2))
@@ -83,6 +83,12 @@ class DemoButton: KeyboardButtonView {
 
             }
         } else {
+            self.addConstraints([
+                NSLayoutConstraint(item:self, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: -3),
+                NSLayoutConstraint(item:self, attribute: .top, relatedBy: .equal, toItem: buttonView!, attribute: .top, multiplier: 1, constant: -3),
+                NSLayoutConstraint(item:self, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: 3),
+                NSLayoutConstraint(item:self, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: 3)
+            ])
             self.addConstraint(NSLayoutConstraint(item:textLabel!, attribute: .centerX, relatedBy: .equal, toItem: buttonView!, attribute: .centerX, multiplier: 1, constant: 0))
             if viewController.context.keyboardType == .alphabetic(.lowercased) && action.isInputAction {
                 self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .centerY, relatedBy: .equal, toItem: buttonView!, attribute: .centerY, multiplier: 1, constant: -2))
@@ -99,12 +105,12 @@ class DemoButton: KeyboardButtonView {
             touching = true
             repeated = false
             
-            for (index, k) in vC!.currentKeys.enumerated() {
+            for k in vC!.currentKeys {
                 switch k.action {
+                    case .space: fallthrough
                     case .character(_):
                         k.gR?.isEnabled = false
                         k.gR?.isEnabled = true
-                        break
                     default:
                         break
                 }
@@ -128,24 +134,20 @@ class DemoButton: KeyboardButtonView {
             startTime = Date()
             
             switch action {
-                case .shift(currentState: .lowercased):
-                    buttonView?.backgroundColor =  ColorAsset(name: "lightButton").color
-                    textLabel?.tintColor =  ColorAsset(name: "lightButtonText").color
-                    break
+                case .shift(currentState: .lowercased): fallthrough
                 case .keyboardType(.symbolic), .keyboardType(.numeric):
                     buttonView?.backgroundColor =  ColorAsset(name: "lightButton").color
                     textLabel?.tintColor =  ColorAsset(name: "lightButtonText").color
                     break
                 case .character(_):
-                    if UIDevice.current.userInterfaceIdiom == .pad {
-                        buttonView?.backgroundColor = action.buttonColorPressed(for: vC!)
-                    } else {
+                    if UIDevice.current.userInterfaceIdiom != .pad {
                         superview?.bringSubviewToFront(self)
                         buttonView?.transform = CGAffineTransform(translationX: 0.0, y: -50.0).scaledBy(x: 1.75, y: 1.5)
                         textLabel?.transform = CGAffineTransform(translationX: 0.0, y: 0.0).scaledBy(x: 1.0, y: 1.75/1.5)
                         buttonView?.backgroundColor = action.buttonColorPressed(for: vC!).withAlphaComponent(1.0)
+                        break
                     }
-                    break
+                    fallthrough
                 default:
                     buttonView?.backgroundColor = action.buttonColorPressed(for: vC!)
                     break
@@ -154,7 +156,6 @@ class DemoButton: KeyboardButtonView {
             switch action {
                 case .keyboardType(_), .shift(_):
                     vC!.context.actionHandler.handle(.tap, on: self.action)
-                    break
                 case .backspace:
                     timer = Timer.scheduledTimer(timeInterval: 0.250, target: self, selector: #selector(keyRepeat), userInfo: nil, repeats: false)
                 default: break
@@ -178,7 +179,7 @@ class DemoButton: KeyboardButtonView {
 //                        self.layer.zPosition = 1
                         buttonView?.transform = .identity
                         textLabel?.transform = .identity
-                        buttonView?.backgroundColor = buttonViewBackgroundColor
+                        fallthrough
                     default:
                         buttonView?.backgroundColor = buttonViewBackgroundColor
                         break
@@ -194,7 +195,6 @@ class DemoButton: KeyboardButtonView {
                             vC?.context.actionHandler.handle(.tap, on: .keyboardType(.alphabetic(.lowercased)))
                         }
                     }
-                    break
                 default:
                     if !repeated {
                         repeated = false
@@ -202,46 +202,10 @@ class DemoButton: KeyboardButtonView {
 //                        vC?.context.actionHandler.handle(.tap, on: self.action)
                         (vC?.context.actionHandler as? DemoKeyboardActionHandler)?.handle(.tap, on: self.action)
                     }
-                    break
             }
         
         }
     }
-    
-//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        touching = true
-//        repeated = false
-//
-//        let handler = vC?.context.actionHandler
-//        (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .tap, on: action, sender: self)
-//        (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .tap, on: action, sender: self)
-//
-//        startTime = Date()
-//
-//        if UIDevice.current.userInterfaceIdiom == .pad {
-//            buttonView?.backgroundColor = action.buttonColorPressed(for: vC!)
-//        } else {
-//            switch action {
-//                case .character(_):
-//                    buttonView?.layer.zPosition = 100
-//                    buttonView?.transform = CGAffineTransform(translationX: 0.0, y: -50.0).scaledBy(x: 1.75, y: 1.5)
-//                    textLabel?.transform = CGAffineTransform(translationX: 0.0, y: 0.0).scaledBy(x: 1.0, y: 1.75/1.5)
-//                    buttonView?.backgroundColor = action.buttonColorPressed(for: vC!).withAlphaComponent(1.0)
-//                default:
-//                    buttonView?.backgroundColor = action.buttonColorPressed(for: vC!)
-//                    break
-//            }
-//        }
-//
-//        switch action {
-//            case .keyboardType(_):
-//                vC!.context.actionHandler.handle(.tap, on: self.action)
-//                break
-//            case .backspace:
-//                timer = Timer.scheduledTimer(timeInterval: 0.250, target: self, selector: #selector(keyRepeat), userInfo: nil, repeats: false)
-//            default: break
-//        }
-//    }
     
     @objc func keyRepeat() {
         if touching {
@@ -255,54 +219,6 @@ class DemoButton: KeyboardButtonView {
             vC?.context.actionHandler.handle(.tap, on: self.action)
         }
     }
-
-//    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        touching = false
-//
-//        if UIDevice.current.userInterfaceIdiom == .pad {
-//            buttonView?.backgroundColor = buttonViewBackgroundColor
-//        } else {
-//            switch action {
-//                case .character(_):
-//                    buttonView?.layer.zPosition = 1
-//                    buttonView?.transform = .identity
-//                    textLabel?.transform = .identity
-//                    buttonView?.backgroundColor = buttonViewBackgroundColor
-//                default:
-//                    buttonView?.backgroundColor = buttonViewBackgroundColor
-//                    break
-//            }
-//        }
-//
-//        switch action {
-//            case .keyboardType(.numeric):
-//                // never gets here
-//                if let startTime = startTime {
-//                    let difference = Date().timeIntervalSince(startTime)
-//                    if difference > 0.3 {
-//                        vC?.context.actionHandler.handle(.tap, on: .keyboardType(.alphabetic(.lowercased)))
-//                    }
-//                }
-//                break
-//            default:
-//                if !repeated {
-//                    repeated = false
-//                    timer?.invalidate()
-//                    vC?.context.actionHandler.handle(.tap, on: self.action)
-//                }
-//                break
-//        }
-//
-//    }
-
-//    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-//
-//}
-
-//    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-////        touching = false
-//        buttonView?.backgroundColor = buttonViewBackgroundColor
-//    }
     
     @IBOutlet weak var buttonView: UIView? {
         didSet { buttonView?.layer.cornerRadius = UIDevice.current.userInterfaceIdiom == .pad ? 8 : 5 }

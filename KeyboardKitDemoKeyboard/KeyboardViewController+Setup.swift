@@ -63,6 +63,10 @@ private extension KeyboardViewController {
         setupBottomRow(rows: &rows, newBottomActions: newBottomActions)
         for (index, row) in rows.enumerated() {
             keyboardStackView.insertArrangedSubview(row, at: index)
+            keyboardStackView.addConstraints([
+                NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: 7),
+                NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: 7)
+            ])
         }
     }
 
@@ -73,6 +77,10 @@ private extension KeyboardViewController {
         setupBottomRow(rows: &rows, newBottomActions: newBottomActions)
         for (index, row) in rows.enumerated() {
             keyboardStackView.insertArrangedSubview(row, at: index)
+            keyboardStackView.addConstraints([
+                NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: 7),
+                NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: 7)
+            ])
         }
     }
     
@@ -83,6 +91,10 @@ private extension KeyboardViewController {
         setupBottomRow(rows: &rows, newBottomActions: newBottomActions)
         for (index, row) in rows.enumerated() {
             keyboardStackView.insertArrangedSubview(row, at: index)
+            keyboardStackView.addConstraints([
+                NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: 7),
+                NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: 7)
+            ])
         }
     }
 }

@@ -44,7 +44,10 @@ extension KeyboardViewController {
         }
         if UIDevice.current.userInterfaceIdiom == .pad {
             for row in rows {
-                row.addConstraint(NSLayoutConstraint(item: row, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 90))
+                row.addConstraints([
+                    NSLayoutConstraint(item: row, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 90)
+                ])
+            
             }
         } else {
             rows.insert(autocompleteToolbar, at: 0)

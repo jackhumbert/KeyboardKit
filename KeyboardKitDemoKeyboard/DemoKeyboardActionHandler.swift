@@ -44,6 +44,8 @@ class DemoKeyboardActionHandler: StandardKeyboardActionHandler {
     
     override func tapAction(for action: KeyboardAction, sender: Any?) -> GestureAction? {
         switch action {
+        case .nextKeyboard: self.inputViewController?.advanceToNextInputMode()
+            return .none
         case .space: return handleSpace(for: sender)
         case .shift(let currentState): return { [weak self] in
             switch currentState {
