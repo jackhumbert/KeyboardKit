@@ -40,11 +40,12 @@ private extension CALayer {
         shadowOffset = CGSize(width: 0, height: 0)
         shadowRadius = blur / 2.0
         let rect = bounds.insetBy(dx: -spread, dy: -spread)
-        let path = UIBezierPath(roundedRect: rect.offsetBy(dx: x/2, dy: y/2), cornerRadius: cornerRadius + spread)
-        path.append(UIBezierPath(roundedRect: bounds.inset(by: UIEdgeInsets(top: y/2, left: 0, bottom: 0, right: 0)), cornerRadius: cornerRadius).reversing())
+        let path = UIBezierPath(roundedRect: rect.offsetBy(dx: x, dy: y), cornerRadius: cornerRadius + spread)
+        path.append(UIBezierPath(roundedRect: bounds.inset(by: UIEdgeInsets(top: y, left: 0, bottom: 0, right: 0)), cornerRadius: cornerRadius).reversing())
         shadowPath = path.cgPath
         shouldRasterize = true
         rasterizationScale = UIScreen.main.scale
+        contentsScale = UIScreen.main.scale
         
     }
 }

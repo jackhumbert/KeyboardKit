@@ -38,7 +38,8 @@ struct AlphabeticKeyboard: DemoKeyboard {
                 .keyboardType(.numeric),
                 .shift(currentState: uppercased ? .uppercased : .lowercased),
                 .space,
-                .keyboardType(.symbolic)
+                .keyboardType(.symbolic),
+                .newLine
             ]]
         }
     }
@@ -79,11 +80,11 @@ private extension AlphabeticKeyboard {
             if uppercased {
             return  [["Q", "W", "F", "P", "G", "J", "L", "U", "Y", KeyboardAction.backspace],
                      ["A", "R", "S", "T", "D", "H", "N", "E", "I", "O"],
-                     ["Z", "X", "C", "V", "B", "K", "M", "!", "?", KeyboardAction.newLine]]
+                     ["Z", "X", "C", "V", "B", "K", "M", "!", "\"","?"]]
             } else {
             return  [["q", "w", "f", "p", "g", "j", "l", "u", "y", KeyboardAction.backspace],
                      ["a", "r", "s", "t", "d", "h", "n", "e", "i", "o"],
-                     ["z", "x", "c", "v", "b", "k", "m", ",", "'", KeyboardAction.newLine]]
+                     ["z", "x", "c", "v", "b", "k", "m", ",", "'", "-"]]
             }
 //            if uppercased {
 //            return  [["M", "B", "W", "H",   "G", "T", "O", "J"],

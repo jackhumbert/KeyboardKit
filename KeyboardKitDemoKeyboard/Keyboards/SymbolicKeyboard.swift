@@ -36,7 +36,8 @@ struct SymbolicKeyboard: DemoKeyboard {
                 .keyboardType(.numeric),
                 .shift(currentState: .lowercased),
                 .space,
-                .keyboardType(.alphabetic(.lowercased))
+                .keyboardType(.alphabetic(.lowercased)),
+                .newLine
             ]]
         }
     }

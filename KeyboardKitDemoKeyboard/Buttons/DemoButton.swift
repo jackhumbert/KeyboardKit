@@ -28,7 +28,12 @@ class DemoButton: KeyboardButtonView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        buttonView?.applyShadowExtra(.standardExtraButtonShadow)
+        let dark = action.useDarkAppearance(in: vC!)
+        if dark {
+            buttonView?.applyShadowExtra(.standardExtraButtonShadowDark)
+        } else {
+            buttonView?.applyShadowExtra(.standardExtraButtonShadowLight)
+        }
     }
     
     open func setup(with action: KeyboardAction, in viewController: KeyboardInputViewController, distribution: UIStackView.Distribution = .fillEqually) {
@@ -37,7 +42,9 @@ class DemoButton: KeyboardButtonView {
         vC = viewController as? KeyboardViewController
         backgroundColor = .clearInteractable
         buttonViewBackgroundColor = action.buttonColor(for: viewController)
-        buttonView?.backgroundColor = buttonViewBackgroundColor
+        if !touching {
+            buttonView?.backgroundColor = buttonViewBackgroundColor
+        }
 //        buttonView?.backgroundColor = .clear
         DispatchQueue.main.async { self.image?.image = action.buttonImage }
         textLabel?.font = action.buttonFont(in: viewController)
@@ -116,8 +123,8 @@ class DemoButton: KeyboardButtonView {
     }
     
     @objc func handlePress(gesture: UILongPressGestureRecognizer) {
-    
-        buttonView?.applyShadowExtra(.standardExtraButtonShadow)
+            
+        let handler = vC?.context.actionHandler
         if gesture.state == .began {
             currentLocation = gesture.location(in: self)
             touching = true
@@ -154,15 +161,16 @@ class DemoButton: KeyboardButtonView {
             switch action {
                 case .shift(currentState: .lowercased): fallthrough
                 case .keyboardType(.symbolic), .keyboardType(.numeric):
-                    buttonView?.backgroundColor =  ColorAsset(name: "lightButton").color
+                    buttonView?.backgroundColor =  ColorAsset(name: "darkSystemButtonActive").color
                     textLabel?.tintColor =  ColorAsset(name: "lightButtonText").color
                     break
                 case .character(_):
                     if UIDevice.current.userInterfaceIdiom != .pad {
                         superview?.bringSubviewToFront(self)
-                        buttonView?.transform = CGAffineTransform(translationX: 0.0, y: -50.0).scaledBy(x: 1.75, y: 1.5)
-                        textLabel?.transform = CGAffineTransform(translationX: 0.0, y: 0.0).scaledBy(x: 1.0, y: 1.75/1.5)
-                        buttonView?.backgroundColor = action.buttonColorPressed(for: vC!).withAlphaComponent(1.0)
+                        buttonView?.applyShadowExtra(.standardExtraButtonShadowCharacter)
+                        buttonView?.transform = CGAffineTransform(translationX: 0.0, y: -54.0).scaledBy(x: 1.75, y: 1.75)
+//                        textLabel?.transform = CGAffineTransform(translationX: 0.0, y: 0.0)
+                        buttonView?.backgroundColor = action.buttonColorRaised(for: vC!)
                         break
                     }
                     fallthrough
@@ -186,7 +194,6 @@ class DemoButton: KeyboardButtonView {
                 if let startTime = startTime {
                     let difference = Date().timeIntervalSince(startTime)
                     if difference > 0.300 {
-                        let handler = vC?.context.actionHandler
                         if !repeated {
                             (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .longPress, on: action, sender: self)
                             (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .longPress, on: action, sender: self)
@@ -210,7 +217,9 @@ class DemoButton: KeyboardButtonView {
                     }
                 }
             } else {
-                if !self.bounds.contains(touchLocation) {
+                if !self.bounds.insetBy(dx: -10, dy: -10).contains(touchLocation) {
+                    (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .longPress, on: action, sender: self)
+                    (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .longPress, on: action, sender: self)
                     touching = false
                     gesture.state = .ended
                     gR?.isEnabled = false
@@ -227,20 +236,26 @@ class DemoButton: KeyboardButtonView {
                 }
             }
         
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                buttonView?.backgroundColor = buttonViewBackgroundColor
-            } else {
-                switch action {
-                    case .character(_):
-//                        self.layer.zPosition = 1
-                        buttonView?.transform = .identity
-                        textLabel?.transform = .identity
-                        fallthrough
-                    default:
-                        buttonView?.backgroundColor = buttonViewBackgroundColor
-                        break
+            UIView.animate(withDuration: 0.100, animations: {
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    self.buttonView?.backgroundColor = self.buttonViewBackgroundColor
+                } else {
+                    switch self.action {
+                        case .character(_):
+                            self.buttonView?.transform = .identity
+                            let dark = self.action.useDarkAppearance(in: self.vC!)
+                            if dark {
+                                self.buttonView?.applyShadowExtra(.standardExtraButtonShadowDark)
+                            } else {
+                                self.buttonView?.applyShadowExtra(.standardExtraButtonShadowLight)
+                            }
+                            fallthrough
+                        default:
+                            self.buttonView?.backgroundColor = self.buttonViewBackgroundColor
+                            break
+                    }
                 }
-            }
+            })
             
             switch action {
                 case .keyboardType(_), .shift(_):
@@ -302,7 +317,7 @@ private extension KeyboardAction {
             : (dark ? Asset.Colors.darkButton : Asset.Colors.lightButton)
         switch self {
             case .shift(currentState: .uppercased):
-                return ColorAsset(name: "lightButton").color
+                return ColorAsset(name: "darkSystemButtonActive").color
             case .newLine:
                 if viewController.textDocumentProxy.returnKeyType != UIReturnKeyType.default {
                     return ColorAsset(name: "blueButton").color
@@ -311,7 +326,7 @@ private extension KeyboardAction {
                 }
             case .keyboardType(.alphabetic(.lowercased)):
                 if viewController.context.keyboardType == .numeric || viewController.context.keyboardType == .symbolic {
-                    return ColorAsset(name: "lightButton").color
+                    return ColorAsset(name: "darkSystemButtonActive").color
                 } else {
                     return asset.color
                 }
@@ -341,6 +356,12 @@ private extension KeyboardAction {
                 }
             default: return asset.color
         }
+    }
+    
+    func buttonColorRaised(for viewController: KeyboardInputViewController) -> UIColor {
+        let dark = useDarkAppearance(in: viewController)
+        let asset = dark ? ColorAsset(name: "darkButtonRaised") : ColorAsset(name: "lightButtonRaised")
+        return asset.color
     }
     
     var buttonImage: UIImage? {
@@ -426,8 +447,7 @@ private extension KeyboardAction {
     var buttonWidth: CGFloat {
         switch self {
         case .none: return 10
-        case .shift, .backspace: return 50
-        case .space: return 50
+//        case .backspace: return 100
         case .moveCursorForward, .moveCursorBackward: return 25
 //        case .character("e"): return 60
 //        case .character("t"): return 60
