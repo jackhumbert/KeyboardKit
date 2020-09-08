@@ -50,70 +50,52 @@ private extension AlphabeticKeyboard {
     static func actions(
         uppercased: Bool,
         in viewController: KeyboardViewController) -> KeyboardActionRows {
-        KeyboardActionRows(characters: characters(uppercased: uppercased))
-            .addingSideActions(uppercased: uppercased)
+        KeyboardActionRows(anything: characters(uppercased: uppercased))
     }
     
-    static func keys(uppercased: Bool) -> [[KeyboardAction]] {
-        return [
-        [
-            .character("Q"),
-            .character("W"),
-        ]
-        ]
-    }
     
-    static func characters(uppercased: Bool) -> [[String]] {
+    static func characters(uppercased: Bool) -> [[Any]] {
     
         if UIDevice.current.userInterfaceIdiom == .pad {
             if uppercased {
-            
-            return  [["Q", "W", "F", "P", "G", "J", "L", "U", "Y"],
-                     ["A", "R", "S", "T", "D", "H", "N", "E", "I", "O"],
-                     ["Z", "X", "C", "V", "B", "K", "M", "!", "?"]]
+            return  [[KeyboardAction.tab,    "Q", "W", "F", "P", "G", "J", "L", "U", "Y", ":", KeyboardAction.backspace],
+                     [                  "-", "A", "R", "S", "T", "D", "H", "N", "E", "I", "O", "`"],
+                     [KeyboardAction.escape, "Z", "X", "C", "V", "B", "K", "M", "!", "@", "?", KeyboardAction.newLine]]
             } else {
-            return  [["q", "w", "f", "p", "g", "j", "l", "u", "y"],
-                     ["a", "r", "s", "t", "d", "h", "n", "e", "i", "o"],
-                     ["z", "x", "c", "v", "b", "k", "m", ",", "."]]
+            return  [[KeyboardAction.tab,    "q", "w", "f", "p", "g", "j", "l", "u", "y", ";", KeyboardAction.backspace],
+                     [                  "-", "a", "r", "s", "t", "d", "h", "n", "e", "i", "o", "'"],
+                     [KeyboardAction.escape, "z", "x", "c", "v", "b", "k", "m", ",", ".", "/", KeyboardAction.newLine]]
             }
         } else {
+//            if uppercased {
+//            return  [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+//                     ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+//                     ["Z", "X", "C", "V", "B", "N", "M", "!", "?"]]
+//            } else {
+//            return  [["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
+//                     ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+//                     ["z", "x", "c", "v", "b", "n", "m", ",", "'"]]
+//            }
             if uppercased {
-            
-            return  [["Q", "W", "F", "P", "G", "J", "L", "U", "Y"],
+            return  [["Q", "W", "F", "P", "G", "J", "L", "U", "Y", KeyboardAction.backspace],
                      ["A", "R", "S", "T", "D", "H", "N", "E", "I", "O"],
-                     ["Z", "X", "C", "V", "B", "K", "M", "!", "?"]]
+                     ["Z", "X", "C", "V", "B", "K", "M", "!", "?", KeyboardAction.newLine]]
             } else {
-            return  [["q", "w", "f", "p", "g", "j", "l", "u", "y"],
+            return  [["q", "w", "f", "p", "g", "j", "l", "u", "y", KeyboardAction.backspace],
                      ["a", "r", "s", "t", "d", "h", "n", "e", "i", "o"],
-                     ["z", "x", "c", "v", "b", "k", "m", ",", "'"]]
+                     ["z", "x", "c", "v", "b", "k", "m", ",", "'", KeyboardAction.newLine]]
             }
+//            if uppercased {
+//            return  [["M", "B", "W", "H",   "G", "T", "O", "J"],
+//                     ["P", "\"", "X", "C",   "I", "E", KeyboardAction.space, "U"],
+//                     ["R", "Y", "S", "Z",   "K", "A", "L", "Q"],
+//                     ["D", "N", "F", "V",   "!", "@", "?", KeyboardAction.backspace]]
+//            } else {
+//            return  [["m", "b", "w", "h",   "g", "t", "o", "j"],
+//                     ["p", "'", "x", "c",   "i", "e", KeyboardAction.space, "u"],
+//                     ["r", "y", "s", "z",   "k", "a", "l", "q"],
+//                     ["d", "n", "f", "v",   ",", ".", "/", KeyboardAction.backspace]]
+//            }
         }
-    }
-}
-
-private extension Sequence where Iterator.Element == KeyboardActionRow {
-    
-    func addingSideActions(uppercased: Bool) -> [Iterator.Element] {
-        var actions = map { $0 }
-//        actions[2].insert(.keyboardType(.symbolic), at: 0)
-//        actions[2].insert(.none, at: 1)
-//        actions[2].append(.none)
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            actions[0].insert(.tab, at: 0)
-            actions[1].insert(.character("-"), at: 0)
-            actions[2].insert(.escape, at: 0)
-            if uppercased {
-                actions[0].append(.character(":"))
-                actions[1].append(.character("`"))
-                actions[2].append(.character("@"))
-            } else {
-                actions[0].append(.character(";"))
-                actions[1].append(.character("'"))
-                actions[2].append(.character("/"))
-            }
-        }
-        actions[0].append(.backspace)
-        actions[2].append(.newLine)
-        return actions
     }
 }

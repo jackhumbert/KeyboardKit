@@ -43,3 +43,4 @@ private extension KeyboardType {
 
     var shouldIncludeImageAction: Bool { self != .images }
 }
+

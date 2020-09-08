@@ -55,13 +55,6 @@ private extension SymbolicKeyboard {
         [";", ":", "*", "+", "/", ".", "&", "^", "~"]
     ]
     
-    static var switchAction: KeyboardAction {
-        .keyboardType(.numeric)
-    }
-    
-    static var switchActionRight: KeyboardAction {
-        .keyboardType(.alphabetic(.lowercased))
-    }
 }
 
 private extension Sequence where Iterator.Element == KeyboardActionRow {

@@ -47,6 +47,8 @@ private extension KeyboardViewController {
             bottomRowThing = bottom[0]
             if UIDevice.current.userInterfaceIdiom == .pad {
                 bottom[0].addConstraint(NSLayoutConstraint(item: bottom[0], attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 90))
+            } else {
+                bottom[0].addConstraint(NSLayoutConstraint(item: bottom[0], attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 53))
             }
             rows.append(bottom[0])
         } else {
@@ -63,10 +65,12 @@ private extension KeyboardViewController {
         setupBottomRow(rows: &rows, newBottomActions: newBottomActions)
         for (index, row) in rows.enumerated() {
             keyboardStackView.insertArrangedSubview(row, at: index)
-            keyboardStackView.addConstraints([
-                NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: 7),
-                NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: 7)
-            ])
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                keyboardStackView.addConstraints([
+                    NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: 7),
+                    NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: 7)
+                ])
+            }
         }
     }
 
@@ -77,10 +81,12 @@ private extension KeyboardViewController {
         setupBottomRow(rows: &rows, newBottomActions: newBottomActions)
         for (index, row) in rows.enumerated() {
             keyboardStackView.insertArrangedSubview(row, at: index)
-            keyboardStackView.addConstraints([
-                NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: 7),
-                NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: 7)
-            ])
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                keyboardStackView.addConstraints([
+                    NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: 7),
+                    NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: 7)
+                ])
+            }
         }
     }
     
@@ -91,10 +97,12 @@ private extension KeyboardViewController {
         setupBottomRow(rows: &rows, newBottomActions: newBottomActions)
         for (index, row) in rows.enumerated() {
             keyboardStackView.insertArrangedSubview(row, at: index)
-            keyboardStackView.addConstraints([
-                NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: 7),
-                NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: 7)
-            ])
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                keyboardStackView.addConstraints([
+                    NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: 7),
+                    NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: 7)
+                ])
+            }
         }
     }
 }

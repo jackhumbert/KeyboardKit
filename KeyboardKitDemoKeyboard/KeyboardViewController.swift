@@ -46,6 +46,7 @@ class KeyboardViewController: KeyboardInputViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setNeedsUpdateOfScreenEdgesDeferringSystemGestures()
+        setupKeyboard()
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

@@ -22,6 +22,7 @@ extension KeyboardViewController {
         if action == .none { return KeyboardSpacerView(width: 10) }
         let view = DemoButton.fromNib(owner: self)
         view.setup(with: action, in: self, distribution: distribution)
+        view.bottomRow = true
         bottomRow.append(view)
         return view
     }
@@ -47,9 +48,13 @@ extension KeyboardViewController {
                 row.addConstraints([
                     NSLayoutConstraint(item: row, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 90)
                 ])
-            
             }
         } else {
+            for row in rows {
+                row.addConstraints([
+                    NSLayoutConstraint(item: row, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 54)
+                ])
+            }
             rows.insert(autocompleteToolbar, at: 0)
         }
         return rows

@@ -23,6 +23,13 @@ class DemoButton: KeyboardButtonView {
     var timer: Timer?
     var repeated: Bool = false
     var gR: UILongPressGestureRecognizer?
+    var bottomRow: Bool = false
+    var currentLocation: CGPoint = CGPoint(x: 0, y: 0)
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        buttonView?.applyShadowExtra(.standardExtraButtonShadow)
+    }
     
     open func setup(with action: KeyboardAction, in viewController: KeyboardInputViewController, distribution: UIStackView.Distribution = .fillEqually) {
         super.setup(with: action, in: viewController)
@@ -33,12 +40,11 @@ class DemoButton: KeyboardButtonView {
         buttonView?.backgroundColor = buttonViewBackgroundColor
 //        buttonView?.backgroundColor = .clear
         DispatchQueue.main.async { self.image?.image = action.buttonImage }
-        textLabel?.font = action.buttonFont
+        textLabel?.font = action.buttonFont(in: viewController)
         textLabel?.text = action.buttonText(in: viewController)
         textLabel?.textColor = action.tintColor(in: viewController)
         buttonView?.tintColor = action.tintColor(in: viewController)
         width = action.buttonWidth(for: distribution)
-        applyShadow(.standardButtonShadow)
         
          if gR == nil {
             gR = UILongPressGestureRecognizer(target: self, action: #selector(handlePress))
@@ -83,12 +89,21 @@ class DemoButton: KeyboardButtonView {
 
             }
         } else {
-            self.addConstraints([
-                NSLayoutConstraint(item:self, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: -3),
-                NSLayoutConstraint(item:self, attribute: .top, relatedBy: .equal, toItem: buttonView!, attribute: .top, multiplier: 1, constant: -3),
-                NSLayoutConstraint(item:self, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: 3),
-                NSLayoutConstraint(item:self, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: 3)
-            ])
+            if bottomRow {
+                self.addConstraints([
+                    NSLayoutConstraint(item:self, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: -3),
+                    NSLayoutConstraint(item:self, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: 3),
+                    NSLayoutConstraint(item:self, attribute: .top, relatedBy: .equal, toItem: buttonView!, attribute: .top, multiplier: 1, constant: -7),
+                    NSLayoutConstraint(item:self, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: 4)
+                ])
+            } else {
+                self.addConstraints([
+                    NSLayoutConstraint(item:self, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: -3),
+                    NSLayoutConstraint(item:self, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: 3),
+                    NSLayoutConstraint(item:self, attribute: .top, relatedBy: .equal, toItem: buttonView!, attribute: .top, multiplier: 1, constant: -7),
+                    NSLayoutConstraint(item:self, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: 5)
+                ])
+            }
             self.addConstraint(NSLayoutConstraint(item:textLabel!, attribute: .centerX, relatedBy: .equal, toItem: buttonView!, attribute: .centerX, multiplier: 1, constant: 0))
             if viewController.context.keyboardType == .alphabetic(.lowercased) && action.isInputAction {
                 self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .centerY, relatedBy: .equal, toItem: buttonView!, attribute: .centerY, multiplier: 1, constant: -2))
@@ -101,7 +116,10 @@ class DemoButton: KeyboardButtonView {
     }
     
     @objc func handlePress(gesture: UILongPressGestureRecognizer) {
+    
+        buttonView?.applyShadowExtra(.standardExtraButtonShadow)
         if gesture.state == .began {
+            currentLocation = gesture.location(in: self)
             touching = true
             repeated = false
             
@@ -162,9 +180,47 @@ class DemoButton: KeyboardButtonView {
             }
         }
         
+        if gesture.state == .changed {
+            let touchLocation = gesture.location(in: self)
+            if action == .space {
+                if let startTime = startTime {
+                    let difference = Date().timeIntervalSince(startTime)
+                    if difference > 0.300 {
+                        let handler = vC?.context.actionHandler
+                        if !repeated {
+                            (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .longPress, on: action, sender: self)
+                            (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .longPress, on: action, sender: self)
+                        }
+                        repeated = true
+                        if currentLocation.x < (touchLocation.x + 8) {
+                            while currentLocation.x < (touchLocation.x - 8) {
+                                (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .tap, on: action, sender: self)
+                                (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .tap, on: action, sender: self)
+                                vC!.context.actionHandler.handle(.tap, on: .moveCursorForward)
+                                currentLocation.x += 8
+                            }
+                        } else if currentLocation.x > (touchLocation.x - 8) {
+                            while currentLocation.x > (touchLocation.x + 8) {
+                                (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .tap, on: action, sender: self)
+                                (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .tap, on: action, sender: self)
+                                vC!.context.actionHandler.handle(.tap, on: .moveCursorBackward)
+                                currentLocation.x -= 8
+                            }
+                        }
+                    }
+                }
+            } else {
+                if !self.bounds.contains(touchLocation) {
+                    touching = false
+                    gesture.state = .ended
+                    gR?.isEnabled = false
+                    gR?.isEnabled = true
+                }
+            }
+        }
+        
         if gesture.state == .ended || gesture.state == .cancelled {
         
-            touching = false
             for (index, k) in vC!.currentKeys.enumerated() {
                 if k == self {
                     vC!.currentKeys.remove(at: index)
@@ -196,13 +252,15 @@ class DemoButton: KeyboardButtonView {
                         }
                     }
                 default:
-                    if !repeated {
+                    if !repeated && touching {
                         repeated = false
                         timer?.invalidate()
 //                        vC?.context.actionHandler.handle(.tap, on: self.action)
                         (vC?.context.actionHandler as? DemoKeyboardActionHandler)?.handle(.tap, on: self.action)
                     }
             }
+            
+            touching = false
         
         }
     }
@@ -294,7 +352,7 @@ private extension KeyboardAction {
         }
     }
     
-    var buttonFont: UIFont? {
+    func buttonFont(in viewController: KeyboardInputViewController) -> UIFont {
         if UIDevice.current.userInterfaceIdiom == .pad {
             switch self {
                 case .character(_): return UIFont.systemFont(ofSize: 32.0, weight: UIFont.Weight.light)
@@ -303,9 +361,15 @@ private extension KeyboardAction {
         } else {
             switch self {
                 case .shift(_): return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
-                case .backspace, .newLine: return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
+                case .backspace: return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
                 case .character(_): return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
-                case .space: return UIFont.systemFont(ofSize: 16.0, weight: UIFont.Weight.regular)
+                case .newLine:
+                    switch viewController.textDocumentProxy.returnKeyType {
+                        case .go:
+                            return UIFont.systemFont(ofSize: 16.0, weight: UIFont.Weight.regular)
+                        default:
+                            return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
+                    }
                 default: return UIFont.systemFont(ofSize: 16.0, weight: UIFont.Weight.regular)
             }
         }
@@ -316,7 +380,19 @@ private extension KeyboardAction {
         case .backspace: return UIDevice.current.userInterfaceIdiom == .pad ? "delete" : "⌫"
         case .character(let text), .emoji(let text): return text
         case .keyboardType(let type): return buttonText(for: type, in: viewController)
-        case .newLine: return UIDevice.current.userInterfaceIdiom == .pad ? "return" : "⏎"
+        case .newLine:
+            switch viewController.textDocumentProxy.returnKeyType {
+                case .continue:
+                    return UIDevice.current.userInterfaceIdiom == .pad ? "continue" : "⏎"
+                case .default:
+                    return UIDevice.current.userInterfaceIdiom == .pad ? "return" : "⏎"
+                case .emergencyCall:
+                    return UIDevice.current.userInterfaceIdiom == .pad ? "call" : "⏎"
+                case .go:
+                    return "go"
+                default:
+                    return UIDevice.current.userInterfaceIdiom == .pad ? "return" : "⏎"
+            }
         case .shift, .custom(name: "shift"): return UIDevice.current.userInterfaceIdiom == .pad ? "shift" : "⇧"
         case .space: return ""
         case .tab: return "tab"
@@ -353,6 +429,23 @@ private extension KeyboardAction {
         case .shift, .backspace: return 50
         case .space: return 50
         case .moveCursorForward, .moveCursorBackward: return 25
+//        case .character("e"): return 60
+//        case .character("t"): return 60
+//        case .character("a"): return 60
+//        case .character("o"): return 60
+//        case .character("i"): return 60
+//        case .character("n"): return 60
+//        case .character("s"): return 60
+//        case .character("r"): return 60
+//        case .character("p"): return 40
+//        case .character("g"): return 40
+//        case .character("b"): return 40
+//        case .character("v"): return 40
+//        case .character("k"): return 40
+//        case .character("j"): return 40
+//        case .character("x"): return 40
+//        case .character("q"): return 40
+//        case .character("z"): return 40
         default: return 50
         }
     }
