@@ -35,8 +35,8 @@ struct NumericKeyboard: DemoKeyboard {
             return [[
                 .keyboardType(.alphabetic(.lowercased)),
                 .character("0"),
-                .space,
                 .keyboardType(.symbolic),
+                .space,
                 .newLine
             ]]
         }
@@ -51,9 +51,9 @@ private extension NumericKeyboard {
     }
     
     static let characters: [[String]] = [
-        ["*", "7", "8", "9"],
-        ["-", "4", "5", "6"],
-        [".", "1", "2", "3"]
+        ["*", "7", "8", "9", "+"],
+        ["-", "4", "5", "6", "/"],
+        [".", "1", "2", "3", "="]
     ]
 }
 

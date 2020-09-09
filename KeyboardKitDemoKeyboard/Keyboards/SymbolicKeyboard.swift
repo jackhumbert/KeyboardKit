@@ -35,8 +35,8 @@ struct SymbolicKeyboard: DemoKeyboard {
             return [[
                 .keyboardType(.numeric),
                 .shift(currentState: .lowercased),
-                .space,
                 .keyboardType(.alphabetic(.lowercased)),
+                .space,
                 .newLine
             ]]
         }
@@ -46,37 +46,25 @@ struct SymbolicKeyboard: DemoKeyboard {
 private extension SymbolicKeyboard {
     
     static func actions(in viewController: KeyboardViewController) -> KeyboardActionRows {
-        KeyboardActionRows(characters: characters)
-            .addingSideActions()
+        KeyboardActionRows(anything: characters())
     }
     
-    static var characters: [[String]] = [
-        ["-", "<", "$", ">", "@", "`", "[", "_", "]"],
-        ["\\", "(", "\"", ")", "#", "%", "{", "=", "}", "|"],
-        [";", ":", "*", "+", "/", ".", "&", "^", "~"]
-    ]
+    static func characters() -> [[Any]] {
     
-}
-
-private extension Sequence where Iterator.Element == KeyboardActionRow {
-    
-    func addingSideActions() -> [Iterator.Element] {
-        var actions = map { $0 }
-//        actions[2].insert(.keyboardType(.numeric), at: 0)
-//        actions[2].insert(.none, at: 1)
-//        actions[2].append(.none)
-//        actions[2].append(.backspace)
         if UIDevice.current.userInterfaceIdiom == .pad {
-            actions[0].insert(.tab, at: 0)
-            actions[1].insert(.character("-"), at: 0)
-            actions[2].insert(.escape, at: 0)
-            
-            actions[0].append(.character(";"))
-            actions[1].append(.character("'"))
-            actions[2].append(.character("/"))
+        return [
+            [KeyboardAction.tab, "-", "<", "$", ">", "@", "`", "[", "_", "]", ";", KeyboardAction.backspace],
+            ["-", "\\", "(", "\"", ")", "#", "%", "{", "=", "}", "|", "'"],
+            [KeyboardAction.escape, ";", ":", "*", "+", "/", ".", "&", "^", "~", "?", KeyboardAction.newLine]
+        ]
+        } else {
+        return [
+            ["-", "<", "$", ">", "@", "`", "[", "_", "]", KeyboardAction.backspace],
+            ["\\", "(", "\"", ")", "#", "%", "{", "=", "}", "|"],
+            [";", ":", "*", "+", "/", ".", "&", "^", "~", "?"]
+        ]
         }
-        actions[0].append(.backspace)
-        actions[2].append(.newLine)
-        return actions
+    
     }
+
 }

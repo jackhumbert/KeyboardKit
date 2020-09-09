@@ -168,7 +168,14 @@ class DemoButton: KeyboardButtonView {
                     if UIDevice.current.userInterfaceIdiom != .pad {
                         superview?.bringSubviewToFront(self)
                         buttonView?.applyShadowExtra(.standardExtraButtonShadowCharacter)
-                        buttonView?.transform = CGAffineTransform(translationX: 0.0, y: -54.0).scaledBy(x: 1.75, y: 1.75)
+                        buttonView?.layer.rasterizationScale = UIScreen.main.scale * 2.0
+                        if self.frame.minX < 10.0 {
+                            buttonView!.transform = CGAffineTransform(translationX: 8.0, y: -54.0).scaledBy(x: 1.5, y: 1.5)
+                        } else if self.frame.maxX > superview!.bounds.maxX - 10.0 {
+                            buttonView!.transform = CGAffineTransform(translationX: -8.0, y: -54.0).scaledBy(x: 1.5, y: 1.5)
+                        } else {
+                            buttonView!.transform = CGAffineTransform(translationX: 0.0, y: -54.0).scaledBy(x: 1.5, y: 1.5)
+                        }
 //                        textLabel?.transform = CGAffineTransform(translationX: 0.0, y: 0.0)
                         buttonView?.backgroundColor = action.buttonColorRaised(for: vC!)
                         break
@@ -217,11 +224,11 @@ class DemoButton: KeyboardButtonView {
                     }
                 }
             } else {
-                if !self.bounds.insetBy(dx: -10, dy: -10).contains(touchLocation) {
+                if !self.bounds.insetBy(dx: -20.0, dy: -20.0).contains(touchLocation) {
                     (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .longPress, on: action, sender: self)
                     (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .longPress, on: action, sender: self)
                     touching = false
-                    gesture.state = .ended
+//                    gesture.state = .ended
                     gR?.isEnabled = false
                     gR?.isEnabled = true
                 }
@@ -236,26 +243,30 @@ class DemoButton: KeyboardButtonView {
                 }
             }
         
-            UIView.animate(withDuration: 0.100, animations: {
+//            UIView.animate(withDuration: 0.050, delay: 0.100, options: .curveEaseInOut, animations: {
                 if UIDevice.current.userInterfaceIdiom == .pad {
                     self.buttonView?.backgroundColor = self.buttonViewBackgroundColor
                 } else {
                     switch self.action {
                         case .character(_):
+                            self.buttonView?.layer.rasterizationScale = UIScreen.main.scale
                             self.buttonView?.transform = .identity
-                            let dark = self.action.useDarkAppearance(in: self.vC!)
-                            if dark {
-                                self.buttonView?.applyShadowExtra(.standardExtraButtonShadowDark)
-                            } else {
-                                self.buttonView?.applyShadowExtra(.standardExtraButtonShadowLight)
-                            }
                             fallthrough
                         default:
                             self.buttonView?.backgroundColor = self.buttonViewBackgroundColor
                             break
                     }
                 }
-            })
+//            }, completion: { (finished: Bool) in
+                if UIDevice.current.userInterfaceIdiom != .pad {
+                    let dark = self.action.useDarkAppearance(in: self.vC!)
+                    if dark {
+                        self.buttonView?.applyShadowExtra(.standardExtraButtonShadowDark)
+                    } else {
+                        self.buttonView?.applyShadowExtra(.standardExtraButtonShadowLight)
+                    }
+                }
+//            })
             
             switch action {
                 case .keyboardType(_), .shift(_):

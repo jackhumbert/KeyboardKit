@@ -37,8 +37,8 @@ struct AlphabeticKeyboard: DemoKeyboard {
             return [[
                 .keyboardType(.numeric),
                 .shift(currentState: uppercased ? .uppercased : .lowercased),
-                .space,
                 .keyboardType(.symbolic),
+                .space,
                 .newLine
             ]]
         }
