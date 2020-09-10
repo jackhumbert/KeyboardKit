@@ -59,7 +59,11 @@ private extension KeyboardViewController {
                 bottomRowHeight = 66
             }
         } else {
-            bottomRowHeight = 53
+            if deviceOrientation.isLandscape {
+                bottomRowHeight = 37
+            } else {
+                bottomRowHeight = 54
+            }
         }
         if bottomRowThing!.heightConstraint != nil {
             bottomRowThing!.heightConstraint?.constant = bottomRowHeight
@@ -78,7 +82,11 @@ private extension KeyboardViewController {
                 rowHeight = 66
             }
         } else {
-            rowHeight = 54
+            if deviceOrientation.isLandscape {
+                rowHeight = 37
+            } else {
+                rowHeight = 54
+            }
         }
         for row in rows {
             row.addConstraints([

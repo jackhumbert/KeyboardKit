@@ -47,4 +47,22 @@ var rightConstraint: NSLayoutConstraint? {
     set { setNeedsLayout() }
 }
 
+var topConstraint: NSLayoutConstraint? {
+    get {
+        return constraints.first(where: {
+            $0.firstAttribute == .top && $0.relation == .equal
+        })
+    }
+    set { setNeedsLayout() }
+}
+
+var bottomConstraint: NSLayoutConstraint? {
+    get {
+        return constraints.first(where: {
+            $0.firstAttribute == .bottom && $0.relation == .equal
+        })
+    }
+    set { setNeedsLayout() }
+}
+
 }

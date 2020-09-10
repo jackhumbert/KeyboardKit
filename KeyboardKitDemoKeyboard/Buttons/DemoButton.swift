@@ -132,10 +132,10 @@ class DemoButton: KeyboardButtonView {
 
             }
         } else {
-            if bottomRow {
-                buttonPadding = UIEdgeInsets(top: 7, left: 3, bottom: 4, right: 3)
+            if viewController.deviceOrientation.isLandscape {
+                buttonPadding = UIEdgeInsets(top: 4, left: 3, bottom: 2, right: 3)
             } else {
-                buttonPadding = UIEdgeInsets(top: 7, left: 3, bottom: 5, right: 3)
+                buttonPadding = UIEdgeInsets(top: 8, left: 3, bottom: 4, right: 3)
             }
             self.addConstraint(NSLayoutConstraint(item:textLabel!, attribute: .centerX, relatedBy: .equal, toItem: buttonView!, attribute: .centerX, multiplier: 1, constant: 0))
             if viewController.context.keyboardType == .alphabetic(.lowercased) && action.isInputAction {
@@ -203,10 +203,16 @@ class DemoButton: KeyboardButtonView {
                     superview?.bringSubviewToFront(self)
                     buttonView?.applyShadowExtra(.standardExtraButtonShadowCharacter)
                     buttonView?.layer.rasterizationScale = UIScreen.main.scale * 2.0
+                    var edgeOffset: CGFloat = 0
+                    if vC!.deviceOrientation.isLandscape {
+                        edgeOffset = 15
+                    } else {
+                        edgeOffset = 8
+                    }
                     if self.frame.minX < 10.0 {
-                        buttonView!.transform = CGAffineTransform(translationX: 8.0, y: -54.0).scaledBy(x: 1.5, y: 1.5)
+                        buttonView!.transform = CGAffineTransform(translationX: edgeOffset, y: -54.0).scaledBy(x: 1.5, y: 1.5)
                     } else if self.frame.maxX > superview!.bounds.maxX - 10.0 {
-                        buttonView!.transform = CGAffineTransform(translationX: -8.0, y: -54.0).scaledBy(x: 1.5, y: 1.5)
+                        buttonView!.transform = CGAffineTransform(translationX: -edgeOffset, y: -54.0).scaledBy(x: 1.5, y: 1.5)
                     } else {
                         buttonView!.transform = CGAffineTransform(translationX: 0.0, y: -54.0).scaledBy(x: 1.5, y: 1.5)
                     }
@@ -437,18 +443,34 @@ private extension KeyboardAction {
                 }
             }
         } else {
-            switch self {
-                case .shift(_): return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
-                case .backspace: return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
-                case .character(_): return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
-                case .newLine:
-                    switch viewController.textDocumentProxy.returnKeyType {
-                        case .go:
-                            return UIFont.systemFont(ofSize: 16.0, weight: UIFont.Weight.regular)
-                        default:
-                            return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
-                    }
-                default: return UIFont.systemFont(ofSize: 16.0, weight: UIFont.Weight.regular)
+            if viewController.deviceOrientation.isLandscape {
+                switch self {
+                    case .shift(_): fallthrough
+                    case .backspace: fallthrough
+                    case .character(_): return UIFont.systemFont(ofSize: 23.0, weight: UIFont.Weight.light)
+                    case .newLine:
+                        switch viewController.textDocumentProxy.returnKeyType {
+                            case .go:
+                                return UIFont.systemFont(ofSize: 16.0, weight: UIFont.Weight.regular)
+                            default:
+                                return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
+                        }
+                    default: return UIFont.systemFont(ofSize: 16.0, weight: UIFont.Weight.regular)
+                }
+            } else {
+                switch self {
+                    case .shift(_): fallthrough
+                    case .backspace: fallthrough
+                    case .character(_): return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
+                    case .newLine:
+                        switch viewController.textDocumentProxy.returnKeyType {
+                            case .go:
+                                return UIFont.systemFont(ofSize: 16.0, weight: UIFont.Weight.regular)
+                            default:
+                                return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
+                        }
+                    default: return UIFont.systemFont(ofSize: 16.0, weight: UIFont.Weight.regular)
+                }
             }
         }
     }
