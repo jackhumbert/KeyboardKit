@@ -10,6 +10,9 @@
 		099499F82507CC0900AB61EA /* KeyboardActionRows+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099499F72507CC0900AB61EA /* KeyboardActionRows+Extra.swift */; };
 		099499FA2507D5F900AB61EA /* Shadow+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099499F92507D5F900AB61EA /* Shadow+Extra.swift */; };
 		099499FC2507DBFD00AB61EA /* UIView+ShadowExtra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099499FB2507DBFD00AB61EA /* UIView+ShadowExtra.swift */; };
+		099499FE250945C100AB61EA /* KeyboardKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099499FD250945C000AB61EA /* KeyboardKey.swift */; };
+		09949A00250985C600AB61EA /* MultitouchGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099499FF250985C600AB61EA /* MultitouchGestureRecognizer.swift */; };
+		09949A02250A473900AB61EA /* UITouch+Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09949A01250A473800AB61EA /* UITouch+Button.swift */; };
 		15133C75245862B300748945 /* EmojiCategory+L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15133C74245862B300748945 /* EmojiCategory+L10n.swift */; };
 		84086E30235587DC0030D95A /* KeyboardViewController+Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84086E2F235587DC0030D95A /* KeyboardViewController+Buttons.swift */; };
 		84086E32235588200030D95A /* KeyboardViewController+Autocomplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84086E31235588200030D95A /* KeyboardViewController+Autocomplete.swift */; };
@@ -201,6 +204,9 @@
 		099499F72507CC0900AB61EA /* KeyboardActionRows+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyboardActionRows+Extra.swift"; sourceTree = "<group>"; };
 		099499F92507D5F900AB61EA /* Shadow+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shadow+Extra.swift"; sourceTree = "<group>"; };
 		099499FB2507DBFD00AB61EA /* UIView+ShadowExtra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+ShadowExtra.swift"; sourceTree = "<group>"; };
+		099499FD250945C000AB61EA /* KeyboardKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardKey.swift; sourceTree = "<group>"; };
+		099499FF250985C600AB61EA /* MultitouchGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultitouchGestureRecognizer.swift; sourceTree = "<group>"; };
+		09949A01250A473800AB61EA /* UITouch+Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITouch+Button.swift"; sourceTree = "<group>"; };
 		15133C74245862B300748945 /* EmojiCategory+L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmojiCategory+L10n.swift"; sourceTree = "<group>"; };
 		84086E2F235587DC0030D95A /* KeyboardViewController+Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyboardViewController+Buttons.swift"; sourceTree = "<group>"; };
 		84086E31235588200030D95A /* KeyboardViewController+Autocomplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyboardViewController+Autocomplete.swift"; sourceTree = "<group>"; };
@@ -362,6 +368,9 @@
 				099499F72507CC0900AB61EA /* KeyboardActionRows+Extra.swift */,
 				099499F92507D5F900AB61EA /* Shadow+Extra.swift */,
 				099499FB2507DBFD00AB61EA /* UIView+ShadowExtra.swift */,
+				099499FD250945C000AB61EA /* KeyboardKey.swift */,
+				099499FF250985C600AB61EA /* MultitouchGestureRecognizer.swift */,
+				09949A01250A473800AB61EA /* UITouch+Button.swift */,
 			);
 			path = KeyboardKitDemoKeyboard;
 			sourceTree = "<group>";
@@ -883,7 +892,10 @@
 				846704B3234A725300355331 /* DemoKeyboardActionHandler.swift in Sources */,
 				846704BC234A725300355331 /* DemoAutocompleteSuggestionProvider.swift in Sources */,
 				846704BA234A725300355331 /* DemoKeyboard.swift in Sources */,
+				09949A02250A473900AB61EA /* UITouch+Button.swift in Sources */,
+				099499FE250945C100AB61EA /* KeyboardKey.swift in Sources */,
 				846704B4234A725300355331 /* DemoButton.swift in Sources */,
+				09949A00250985C600AB61EA /* MultitouchGestureRecognizer.swift in Sources */,
 				846704B9234A725300355331 /* SymbolicKeyboard.swift in Sources */,
 				099499F82507CC0900AB61EA /* KeyboardActionRows+Extra.swift in Sources */,
 				84086E32235588200030D95A /* KeyboardViewController+Autocomplete.swift in Sources */,

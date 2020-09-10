@@ -25,6 +25,8 @@ class DemoButton: KeyboardButtonView {
     var gR: UILongPressGestureRecognizer?
     var bottomRow: Bool = false
     var currentLocation: CGPoint = CGPoint(x: 0, y: 0)
+    var character: Character?
+    var lastTouch: UITouch?
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -35,6 +37,16 @@ class DemoButton: KeyboardButtonView {
             buttonView?.applyShadowExtra(.standardExtraButtonShadowLight)
         }
     }
+    
+//    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+//        var margin: CGFloat = 0
+//        switch action {
+//            case .character("e"): margin = 50
+//            default: break
+//        }
+//        let area = self.bounds.insetBy(dx: -margin, dy: -margin)
+//        return area.contains(point)
+//    }
     
     open func setup(with action: KeyboardAction, in viewController: KeyboardInputViewController, distribution: UIStackView.Distribution = .fillEqually) {
         super.setup(with: action, in: viewController)
@@ -49,27 +61,33 @@ class DemoButton: KeyboardButtonView {
         DispatchQueue.main.async { self.image?.image = action.buttonImage }
         textLabel?.font = action.buttonFont(in: viewController)
         textLabel?.text = action.buttonText(in: viewController)
+        switch action {
+            case .character(let text):
+                if text.rangeOfCharacter(from: CharacterSet.lowercaseLetters.inverted) == nil {
+                    character = text.first
+                } else if text.rangeOfCharacter(from: CharacterSet.uppercaseLetters.inverted) == nil {
+                    character = text.lowercased().first
+                } else {
+                    character = " "
+                }
+            default: break
+        }
         textLabel?.textColor = action.tintColor(in: viewController)
         buttonView?.tintColor = action.tintColor(in: viewController)
         width = action.buttonWidth(for: distribution)
         
-         if gR == nil {
-            gR = UILongPressGestureRecognizer(target: self, action: #selector(handlePress))
-            gR!.minimumPressDuration = 0.0
-            addGestureRecognizer(gR!)
-        }
+//         if gR == nil {
+//            gR = UILongPressGestureRecognizer(target: self, action: #selector(handlePress))
+//            gR!.minimumPressDuration = 0.0
+//            addGestureRecognizer(gR!)
+//        }
     
         self.removeConstraints(self.constraints)
         
-
+        var buttonPadding = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         
         if UIDevice.current.userInterfaceIdiom == .pad {
-            self.addConstraints([
-                NSLayoutConstraint(item:self, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: -7),
-                NSLayoutConstraint(item:self, attribute: .top, relatedBy: .equal, toItem: buttonView!, attribute: .top, multiplier: 1, constant: -7),
-                NSLayoutConstraint(item:self, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: 7),
-                NSLayoutConstraint(item:self, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: 7)
-            ])
+            buttonPadding = UIEdgeInsets(top: 7, left: 7, bottom: 7, right: 7)
             switch action {
                 case .keyboardType(.alphabetic(.lowercased)):
                     if viewController.context.keyboardType == .numeric {
@@ -97,19 +115,9 @@ class DemoButton: KeyboardButtonView {
             }
         } else {
             if bottomRow {
-                self.addConstraints([
-                    NSLayoutConstraint(item:self, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: -3),
-                    NSLayoutConstraint(item:self, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: 3),
-                    NSLayoutConstraint(item:self, attribute: .top, relatedBy: .equal, toItem: buttonView!, attribute: .top, multiplier: 1, constant: -7),
-                    NSLayoutConstraint(item:self, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: 4)
-                ])
+                buttonPadding = UIEdgeInsets(top: 7, left: 3, bottom: 4, right: 3)
             } else {
-                self.addConstraints([
-                    NSLayoutConstraint(item:self, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: -3),
-                    NSLayoutConstraint(item:self, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: 3),
-                    NSLayoutConstraint(item:self, attribute: .top, relatedBy: .equal, toItem: buttonView!, attribute: .top, multiplier: 1, constant: -7),
-                    NSLayoutConstraint(item:self, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: 5)
-                ])
+                buttonPadding = UIEdgeInsets(top: 7, left: 3, bottom: 5, right: 3)
             }
             self.addConstraint(NSLayoutConstraint(item:textLabel!, attribute: .centerX, relatedBy: .equal, toItem: buttonView!, attribute: .centerX, multiplier: 1, constant: 0))
             if viewController.context.keyboardType == .alphabetic(.lowercased) && action.isInputAction {
@@ -120,175 +128,185 @@ class DemoButton: KeyboardButtonView {
             self.addConstraint(NSLayoutConstraint(item: image!, attribute: .centerX, relatedBy: .equal, toItem: buttonView!, attribute: .centerX, multiplier: 1, constant: 0))
             self.addConstraint(NSLayoutConstraint(item: image!, attribute: .centerY, relatedBy: .equal, toItem: buttonView!, attribute: .centerY, multiplier: 1, constant: 0))
         }
+        
+        self.addConstraints([
+            NSLayoutConstraint(item:self, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: -buttonPadding.left),
+            NSLayoutConstraint(item:self, attribute: .top, relatedBy: .equal, toItem: buttonView!, attribute: .top, multiplier: 1, constant: -buttonPadding.top),
+            NSLayoutConstraint(item:self, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: buttonPadding.right),
+            NSLayoutConstraint(item:self, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: buttonPadding.bottom)
+        ])
     }
     
-    @objc func handlePress(gesture: UILongPressGestureRecognizer) {
-            
+    @objc func handleBegin(touch: UITouch) {
+    
+        lastTouch = touch
         let handler = vC?.context.actionHandler
-        if gesture.state == .began {
-            currentLocation = gesture.location(in: self)
-            touching = true
-            repeated = false
-            
-            for k in vC!.currentKeys {
-                switch k.action {
-                    case .space: fallthrough
-                    case .character(_):
-                        k.gR?.isEnabled = false
-                        k.gR?.isEnabled = true
-                    default:
-                        break
-                }
-            }
-            vC!.currentKeys.append(self)
-            
-            let handler = vC?.context.actionHandler
-            (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .tap, on: action, sender: self)
-            (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .tap, on: action, sender: self)
-            
-            if action == .space {
-                if let startTime = startTime {
-                    let difference = Date().timeIntervalSince(startTime)
-                    if difference < 0.300 {
-                        vC?.context.actionHandler.handle(.tap, on: .backspace)
-                        vC?.context.actionHandler.handle(.tap, on: .character("."))
-                    }
-                }
-            }
-            
-            startTime = Date()
-            
-            switch action {
-                case .shift(currentState: .lowercased): fallthrough
-                case .keyboardType(.symbolic), .keyboardType(.numeric):
-                    buttonView?.backgroundColor =  ColorAsset(name: "darkSystemButtonActive").color
-                    textLabel?.tintColor =  ColorAsset(name: "lightButtonText").color
-                    break
+        currentLocation = touch.location(in: self)
+        touching = true
+        repeated = false
+        
+        for k in vC!.currentKeys {
+            switch k.action {
+                case .space: fallthrough
                 case .character(_):
-                    if UIDevice.current.userInterfaceIdiom != .pad {
-                        superview?.bringSubviewToFront(self)
-                        buttonView?.applyShadowExtra(.standardExtraButtonShadowCharacter)
-                        buttonView?.layer.rasterizationScale = UIScreen.main.scale * 2.0
-                        if self.frame.minX < 10.0 {
-                            buttonView!.transform = CGAffineTransform(translationX: 8.0, y: -54.0).scaledBy(x: 1.5, y: 1.5)
-                        } else if self.frame.maxX > superview!.bounds.maxX - 10.0 {
-                            buttonView!.transform = CGAffineTransform(translationX: -8.0, y: -54.0).scaledBy(x: 1.5, y: 1.5)
-                        } else {
-                            buttonView!.transform = CGAffineTransform(translationX: 0.0, y: -54.0).scaledBy(x: 1.5, y: 1.5)
-                        }
-//                        textLabel?.transform = CGAffineTransform(translationX: 0.0, y: 0.0)
-                        buttonView?.backgroundColor = action.buttonColorRaised(for: vC!)
-                        break
-                    }
-                    fallthrough
+                    k.gR?.isEnabled = false
+                    k.gR?.isEnabled = true
                 default:
-                    buttonView?.backgroundColor = action.buttonColorPressed(for: vC!)
                     break
             }
-            
-            switch action {
-                case .keyboardType(_), .shift(_):
-                    vC!.context.actionHandler.handle(.tap, on: self.action)
-                case .backspace:
-                    timer = Timer.scheduledTimer(timeInterval: 0.250, target: self, selector: #selector(keyRepeat), userInfo: nil, repeats: false)
-                default: break
+        }
+        if !vC!.currentKeys.contains(self) {
+            vC!.currentKeys.append(self)
+        }
+        
+        (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .tap, on: action, sender: self)
+        (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .tap, on: action, sender: self)
+        
+        if action == .space {
+            if let startTime = startTime {
+                let difference = Date().timeIntervalSince(startTime)
+                if difference < 0.300 {
+                    vC?.context.actionHandler.handle(.tap, on: .backspace)
+                    vC?.context.actionHandler.handle(.tap, on: .character("."))
+                }
             }
         }
         
-        if gesture.state == .changed {
-            let touchLocation = gesture.location(in: self)
-            if action == .space {
+        startTime = Date()
+        
+        switch action {
+            case .shift(currentState: .lowercased): fallthrough
+            case .keyboardType(.symbolic), .keyboardType(.numeric):
+                buttonView?.backgroundColor =  ColorAsset(name: "darkSystemButtonActive").color
+                textLabel?.tintColor =  ColorAsset(name: "lightButtonText").color
+                break
+            case .character(_):
+                if UIDevice.current.userInterfaceIdiom != .pad {
+                    superview?.bringSubviewToFront(self)
+                    buttonView?.applyShadowExtra(.standardExtraButtonShadowCharacter)
+                    buttonView?.layer.rasterizationScale = UIScreen.main.scale * 2.0
+                    if self.frame.minX < 10.0 {
+                        buttonView!.transform = CGAffineTransform(translationX: 8.0, y: -54.0).scaledBy(x: 1.5, y: 1.5)
+                    } else if self.frame.maxX > superview!.bounds.maxX - 10.0 {
+                        buttonView!.transform = CGAffineTransform(translationX: -8.0, y: -54.0).scaledBy(x: 1.5, y: 1.5)
+                    } else {
+                        buttonView!.transform = CGAffineTransform(translationX: 0.0, y: -54.0).scaledBy(x: 1.5, y: 1.5)
+                    }
+//                        textLabel?.transform = CGAffineTransform(translationX: 0.0, y: 0.0)
+                    buttonView?.backgroundColor = action.buttonColorRaised(for: vC!)
+                    break
+                }
+                fallthrough
+            default:
+                buttonView?.backgroundColor = action.buttonColorPressed(for: vC!)
+                break
+        }
+        
+        switch action {
+            case .keyboardType(_), .shift(_):
+                vC!.context.actionHandler.handle(.tap, on: self.action)
+            case .backspace:
+                timer = Timer.scheduledTimer(timeInterval: 0.250, target: self, selector: #selector(keyRepeat), userInfo: nil, repeats: false)
+            default: break
+        }
+    }
+    
+    @objc func handleMove(touch: UITouch) {
+        let handler = vC?.context.actionHandler
+        let touchLocation = touch.location(in: self)
+        if action == .space {
+            if let startTime = startTime {
+                let difference = Date().timeIntervalSince(startTime)
+                if difference > 0.300 {
+                    if !repeated {
+                        (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .longPress, on: action, sender: self)
+                        (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .longPress, on: action, sender: self)
+                    }
+                    repeated = true
+                    if currentLocation.x < (touchLocation.x + 8) {
+                        while currentLocation.x < (touchLocation.x - 8) {
+                            (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .tap, on: action, sender: self)
+                            (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .tap, on: action, sender: self)
+                            vC!.context.actionHandler.handle(.tap, on: .moveCursorForward)
+                            currentLocation.x += 8
+                        }
+                    } else if currentLocation.x > (touchLocation.x - 8) {
+                        while currentLocation.x > (touchLocation.x + 8) {
+                            (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .tap, on: action, sender: self)
+                            (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .tap, on: action, sender: self)
+                            vC!.context.actionHandler.handle(.tap, on: .moveCursorBackward)
+                            currentLocation.x -= 8
+                        }
+                    }
+                }
+            }
+        } else {
+            if !self.bounds.insetBy(dx: -40.0, dy: -40.0).contains(touchLocation) {
+                (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .longPress, on: action, sender: self)
+                (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .longPress, on: action, sender: self)
+                touching = false
+//                    gesture.state = .ended
+                gR?.isEnabled = false
+                gR?.isEnabled = true
+            }
+        }
+    }
+    
+    @objc func handleEnd(touch: UITouch) {
+//        let handler = vC?.context.actionHandler
+    
+        for (index, k) in vC!.currentKeys.enumerated() {
+            if k == self {
+                vC!.currentKeys.remove(at: index)
+            }
+        }
+    
+//            UIView.animate(withDuration: 0.050, delay: 0.100, options: .curveEaseInOut, animations: {
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                self.buttonView?.backgroundColor = self.buttonViewBackgroundColor
+            } else {
+                switch self.action {
+                    case .character(_):
+                        self.buttonView?.layer.rasterizationScale = UIScreen.main.scale
+                        self.buttonView?.transform = .identity
+                        fallthrough
+                    default:
+                        self.buttonView?.backgroundColor = self.buttonViewBackgroundColor
+                        break
+                }
+            }
+//            }, completion: { (finished: Bool) in
+            if UIDevice.current.userInterfaceIdiom != .pad {
+                let dark = self.action.useDarkAppearance(in: self.vC!)
+                if dark {
+                    self.buttonView?.applyShadowExtra(.standardExtraButtonShadowDark)
+                } else {
+                    self.buttonView?.applyShadowExtra(.standardExtraButtonShadowLight)
+                }
+            }
+//            })
+        
+        switch action {
+            case .keyboardType(_), .shift(_):
+                // never gets here
                 if let startTime = startTime {
                     let difference = Date().timeIntervalSince(startTime)
                     if difference > 0.300 {
-                        if !repeated {
-                            (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .longPress, on: action, sender: self)
-                            (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .longPress, on: action, sender: self)
-                        }
-                        repeated = true
-                        if currentLocation.x < (touchLocation.x + 8) {
-                            while currentLocation.x < (touchLocation.x - 8) {
-                                (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .tap, on: action, sender: self)
-                                (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .tap, on: action, sender: self)
-                                vC!.context.actionHandler.handle(.tap, on: .moveCursorForward)
-                                currentLocation.x += 8
-                            }
-                        } else if currentLocation.x > (touchLocation.x - 8) {
-                            while currentLocation.x > (touchLocation.x + 8) {
-                                (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .tap, on: action, sender: self)
-                                (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .tap, on: action, sender: self)
-                                vC!.context.actionHandler.handle(.tap, on: .moveCursorBackward)
-                                currentLocation.x -= 8
-                            }
-                        }
+                        vC?.context.actionHandler.handle(.tap, on: .keyboardType(.alphabetic(.lowercased)))
                     }
                 }
-            } else {
-                if !self.bounds.insetBy(dx: -20.0, dy: -20.0).contains(touchLocation) {
-                    (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .longPress, on: action, sender: self)
-                    (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .longPress, on: action, sender: self)
-                    touching = false
-//                    gesture.state = .ended
-                    gR?.isEnabled = false
-                    gR?.isEnabled = true
-                }
-            }
-        }
-        
-        if gesture.state == .ended || gesture.state == .cancelled {
-        
-            for (index, k) in vC!.currentKeys.enumerated() {
-                if k == self {
-                    vC!.currentKeys.remove(at: index)
-                }
-            }
-        
-//            UIView.animate(withDuration: 0.050, delay: 0.100, options: .curveEaseInOut, animations: {
-                if UIDevice.current.userInterfaceIdiom == .pad {
-                    self.buttonView?.backgroundColor = self.buttonViewBackgroundColor
-                } else {
-                    switch self.action {
-                        case .character(_):
-                            self.buttonView?.layer.rasterizationScale = UIScreen.main.scale
-                            self.buttonView?.transform = .identity
-                            fallthrough
-                        default:
-                            self.buttonView?.backgroundColor = self.buttonViewBackgroundColor
-                            break
-                    }
-                }
-//            }, completion: { (finished: Bool) in
-                if UIDevice.current.userInterfaceIdiom != .pad {
-                    let dark = self.action.useDarkAppearance(in: self.vC!)
-                    if dark {
-                        self.buttonView?.applyShadowExtra(.standardExtraButtonShadowDark)
-                    } else {
-                        self.buttonView?.applyShadowExtra(.standardExtraButtonShadowLight)
-                    }
-                }
-//            })
-            
-            switch action {
-                case .keyboardType(_), .shift(_):
-                    // never gets here
-                    if let startTime = startTime {
-                        let difference = Date().timeIntervalSince(startTime)
-                        if difference > 0.300 {
-                            vC?.context.actionHandler.handle(.tap, on: .keyboardType(.alphabetic(.lowercased)))
-                        }
-                    }
-                default:
-                    if !repeated && touching {
-                        repeated = false
-                        timer?.invalidate()
+            default:
+                if !repeated && touching {
+                    repeated = false
+                    timer?.invalidate()
 //                        vC?.context.actionHandler.handle(.tap, on: self.action)
-                        (vC?.context.actionHandler as? DemoKeyboardActionHandler)?.handle(.tap, on: self.action)
-                    }
-            }
-            
-            touching = false
-        
+                    (vC?.context.actionHandler as? DemoKeyboardActionHandler)?.handle(.tap, on: self.action)
+                }
         }
+        
+        touching = false
+        
+
     }
     
     @objc func keyRepeat() {
