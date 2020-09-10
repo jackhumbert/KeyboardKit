@@ -10,7 +10,15 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    @IBInspectable var light: Bool = false
+
     @IBOutlet weak var textView: UITextView? {
         didSet { textView?.contentInset = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: 0) }
+    }
+    
+    override func viewDidLoad() {
+        if #available(iOS 13.0, *) {
+            self.overrideUserInterfaceStyle = self.light ? .light : .dark
+        }
     }
 }

@@ -12,15 +12,14 @@ import UIKit
 /**
  This demo keyboard mimicks an English symbolic keyboard.
  */
-struct SymbolicKeyboard: DemoKeyboard {
+class SymbolicKeyboard: DemoKeyboard {
     
     init(in viewController: KeyboardViewController) {
-        actions = type(of: self).actions(in: viewController)
+        super.init()
+        actions = actions(in: viewController)
     }
     
-    let actions: KeyboardActionRows
-    
-    static func bottomActions(in vc: KeyboardViewController) -> KeyboardActionRows {
+    func bottomActions(in vc: KeyboardViewController) -> KeyboardActionRows {
         if UIDevice.current.userInterfaceIdiom == .pad {
             return [[
                 .nextKeyboard,
@@ -41,15 +40,12 @@ struct SymbolicKeyboard: DemoKeyboard {
             ]]
         }
     }
-}
-
-private extension SymbolicKeyboard {
     
-    static func actions(in viewController: KeyboardViewController) -> KeyboardActionRows {
+    func actions(in viewController: KeyboardViewController) -> KeyboardActionRows {
         KeyboardActionRows(anything: characters())
     }
     
-    static func characters() -> [[Any]] {
+    func characters() -> [[Any]] {
     
         if UIDevice.current.userInterfaceIdiom == .pad {
         return [

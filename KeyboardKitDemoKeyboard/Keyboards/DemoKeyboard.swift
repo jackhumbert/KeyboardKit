@@ -16,10 +16,13 @@ import UIKit
  The demo keyboards are for demo purposes, so they lack some
  functionality, like adapting to languages, device types etc.
  */
-protocol DemoKeyboard {}
+class DemoKeyboard {
+    var actions: KeyboardActionRows = [[]]
+}
+
 
 private extension DemoKeyboard {
-    
+
     static func switchAction(for vc: KeyboardViewController) -> KeyboardAction {
         let needsSwitch = vc.needsInputModeSwitchKey
         return needsSwitch ? .nextKeyboard : .keyboardType(.emojis)

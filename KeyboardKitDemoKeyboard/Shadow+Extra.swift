@@ -14,7 +14,7 @@ public extension Shadow {
         Shadow(alpha: 0.5, blur: 0.0, spread: 0, x: 0, y: 1)
     }
     static var standardExtraButtonShadowLight: Shadow {
-        Shadow(alpha: 0.3, blur: 0.0, spread: 0, x: 0, y: 1)
+        Shadow(alpha: 0.35, blur: 0.0, spread: 0, x: 0, y: 1)
     }
     static var standardExtraButtonShadowCharacter: Shadow {
         Shadow(alpha: 0.5, blur: 5.0, spread: 1.0, x: 0, y: 1)

@@ -45,64 +45,93 @@ private extension KeyboardViewController {
                 buttonRowBottom(for: $0, distribution: .fillProportionally)
             }
             bottomRowThing = bottom[0]
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                bottom[0].addConstraint(NSLayoutConstraint(item: bottom[0], attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 90))
-            } else {
-                bottom[0].addConstraint(NSLayoutConstraint(item: bottom[0], attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 53))
-            }
             rows.append(bottom[0])
         } else {
             for (index, button) in bottomRow.enumerated() {
                 button.setup(with: (newBottomActions as [[KeyboardAction]])[0][index], in: self, distribution: .fillProportionally)
             }
         }
+        var bottomRowHeight: CGFloat = 0
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            if deviceOrientation.isLandscape {
+                bottomRowHeight = 90
+            } else {
+                bottomRowHeight = 66
+            }
+        } else {
+            bottomRowHeight = 53
+        }
+        if bottomRowThing!.heightConstraint != nil {
+            bottomRowThing!.heightConstraint?.constant = bottomRowHeight
+        } else {
+            bottomRowThing!.addConstraint(NSLayoutConstraint(item: bottomRowThing!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: bottomRowHeight))
+        }
+    }
+    
+    func setupRows(keyboard: DemoKeyboard) -> [KeyboardStackViewComponent] {
+        let rows = buttonRows(for: keyboard.actions, distribution: .fillProportionally)
+        var rowHeight: CGFloat = 0
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            if deviceOrientation.isLandscape {
+                rowHeight = 90
+            } else {
+                rowHeight = 66
+            }
+        } else {
+            rowHeight = 54
+        }
+        for row in rows {
+            row.addConstraints([
+                NSLayoutConstraint(item: row, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: rowHeight)
+            ])
+        }
+        return rows
+    }
+    
+    func setupAllRows(rows: [KeyboardStackViewComponent]) {
+        for (index, row) in rows.enumerated() {
+            keyboardStackView.insertArrangedSubview(row, at: index)
+            var rowPadding: CGFloat = 0
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                if deviceOrientation.isLandscape {
+                    rowPadding = 7
+                } else {
+                    rowPadding = 5
+                }
+            }
+            if keyboardStackView.leftConstraint == nil {
+                keyboardStackView.addConstraints([
+                    NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: rowPadding),
+                    NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: rowPadding)
+                ])
+            } else {
+                keyboardStackView.leftConstraint?.constant = rowPadding
+                keyboardStackView.rightConstraint?.constant = rowPadding
+            }
+        }
     }
     
     func setupAlphabeticKeyboard(for state: KeyboardShiftState) {
         let keyboard = AlphabeticKeyboard(uppercased: state.isUppercased, in: self)
-        var rows = buttonRows(for: keyboard.actions, distribution: .fillProportionally)
-        let newBottomActions = AlphabeticKeyboard.bottomActions(uppercased: state.isUppercased, in: self)
+        let newBottomActions = keyboard.bottomActions(uppercased: state.isUppercased, in: self)
+        var rows = setupRows(keyboard: keyboard)
         setupBottomRow(rows: &rows, newBottomActions: newBottomActions)
-        for (index, row) in rows.enumerated() {
-            keyboardStackView.insertArrangedSubview(row, at: index)
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                keyboardStackView.addConstraints([
-                    NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: 7),
-                    NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: 7)
-                ])
-            }
-        }
+        setupAllRows(rows: rows)
     }
 
     func setupNumericKeyboard() {
         let keyboard = NumericKeyboard(in: self)
-        var rows = buttonRows(for: keyboard.actions, distribution: .fillProportionally)
-        let newBottomActions = NumericKeyboard.bottomActions(in: self)
+        let newBottomActions = keyboard.bottomActions(in: self)
+        var rows = setupRows(keyboard: keyboard)
         setupBottomRow(rows: &rows, newBottomActions: newBottomActions)
-        for (index, row) in rows.enumerated() {
-            keyboardStackView.insertArrangedSubview(row, at: index)
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                keyboardStackView.addConstraints([
-                    NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: 7),
-                    NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: 7)
-                ])
-            }
-        }
+        setupAllRows(rows: rows)
     }
     
     func setupSymbolicKeyboard() {
         let keyboard = SymbolicKeyboard(in: self)
-        var rows = buttonRows(for: keyboard.actions, distribution: .fillProportionally)
-        let newBottomActions = SymbolicKeyboard.bottomActions(in: self)
+        let newBottomActions = keyboard.bottomActions(in: self)
+        var rows = setupRows(keyboard: keyboard)
         setupBottomRow(rows: &rows, newBottomActions: newBottomActions)
-        for (index, row) in rows.enumerated() {
-            keyboardStackView.insertArrangedSubview(row, at: index)
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                keyboardStackView.addConstraints([
-                    NSLayoutConstraint(item: row, attribute: .left, relatedBy: .equal, toItem: keyboardStackView, attribute: .left, multiplier: 1, constant: 7),
-                    NSLayoutConstraint(item: keyboardStackView, attribute: .right, relatedBy: .equal, toItem: row, attribute: .right, multiplier: 1, constant: 7)
-                ])
-            }
-        }
+        setupAllRows(rows: rows)
     }
 }

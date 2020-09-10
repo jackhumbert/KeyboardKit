@@ -12,17 +12,16 @@ import UIKit
 /**
  This demo keyboard mimicks an English alphabetic keyboard.
  */
-struct AlphabeticKeyboard: DemoKeyboard {
+class AlphabeticKeyboard: DemoKeyboard {
     
     init(uppercased: Bool, in viewController: KeyboardViewController) {
-        actions = AlphabeticKeyboard.actions(
+        super.init()
+        actions = actions(
             uppercased: uppercased,
             in: viewController)
     }
-
-    var actions: KeyboardActionRows
     
-    static func bottomActions(uppercased: Bool, in vc: KeyboardViewController) -> KeyboardActionRows {
+    func bottomActions(uppercased: Bool, in vc: KeyboardViewController) -> KeyboardActionRows {
         if UIDevice.current.userInterfaceIdiom == .pad {
             return [[
                 .nextKeyboard,
@@ -43,24 +42,20 @@ struct AlphabeticKeyboard: DemoKeyboard {
             ]]
         }
     }
-}
-
-
-private extension AlphabeticKeyboard {
     
-    static func actions(
+    func actions(
         uppercased: Bool,
         in viewController: KeyboardViewController) -> KeyboardActionRows {
         KeyboardActionRows(anything: characters(uppercased: uppercased))
     }
     
     
-    static func characters(uppercased: Bool) -> [[Any]] {
+    func characters(uppercased: Bool) -> [[Any]] {
     
         if UIDevice.current.userInterfaceIdiom == .pad {
             if uppercased {
             return  [[KeyboardAction.tab,    "Q", "W", "F", "P", "G", "J", "L", "U", "Y", ":", KeyboardAction.backspace],
-                     [                  "-", "A", "R", "S", "T", "D", "H", "N", "E", "I", "O", "`"],
+                     [                  "_", "A", "R", "S", "T", "D", "H", "N", "E", "I", "O", "\""],
                      [KeyboardAction.escape, "Z", "X", "C", "V", "B", "K", "M", "!", "@", "?", KeyboardAction.newLine]]
             } else {
             return  [[KeyboardAction.tab,    "q", "w", "f", "p", "g", "j", "l", "u", "y", ";", KeyboardAction.backspace],

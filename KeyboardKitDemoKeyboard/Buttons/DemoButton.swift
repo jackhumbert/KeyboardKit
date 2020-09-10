@@ -38,6 +38,7 @@ class DemoButton: KeyboardButtonView {
         }
     }
     
+    
 //    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
 //        var margin: CGFloat = 0
 //        switch action {
@@ -58,7 +59,7 @@ class DemoButton: KeyboardButtonView {
             buttonView?.backgroundColor = buttonViewBackgroundColor
         }
 //        buttonView?.backgroundColor = .clear
-        DispatchQueue.main.async { self.image?.image = action.buttonImage }
+        DispatchQueue.main.async { self.image?.image = action.buttonImage(in: viewController) }
         textLabel?.font = action.buttonFont(in: viewController)
         textLabel?.text = action.buttonText(in: viewController)
         switch action {
@@ -84,27 +85,44 @@ class DemoButton: KeyboardButtonView {
     
         self.removeConstraints(self.constraints)
         
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            if viewController.deviceOrientation.isLandscape {
+                buttonView?.layer.cornerRadius = 8
+            } else {
+                buttonView?.layer.cornerRadius = 5
+            }
+        } else {
+            buttonView?.layer.cornerRadius = 5
+        }
+            
         var buttonPadding = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        var textPadding = CGPoint(x: 0, y: 0)
         
         if UIDevice.current.userInterfaceIdiom == .pad {
-            buttonPadding = UIEdgeInsets(top: 7, left: 7, bottom: 7, right: 7)
+            if viewController.deviceOrientation.isLandscape {
+                buttonPadding = UIEdgeInsets(top: 7, left: 7, bottom: 7, right: 7)
+                textPadding = CGPoint(x: 8, y: 6)
+            } else {
+                buttonPadding = UIEdgeInsets(top: 5, left: 5, bottom: 4, right: 5)
+                textPadding = CGPoint(x: 7, y: 5)
+            }
             switch action {
                 case .keyboardType(.alphabetic(.lowercased)):
                     if viewController.context.keyboardType == .numeric {
-                        self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: 8))
-                        self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -6))
+                        self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: textPadding.x))
+                        self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -textPadding.y))
                     } else {
-                        self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: -8))
-                        self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -6))
+                        self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: -textPadding.x))
+                        self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -textPadding.y))
                     }
                 case .tab, .escape, .shift(_), .keyboardType(.numeric), .nextKeyboard:
-                    self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: 8))
-                    self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -6))
-                    self.addConstraint(NSLayoutConstraint(item: image!, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: 8))
-                    self.addConstraint(NSLayoutConstraint(item: image!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -6))
+                    self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: textPadding.x))
+                    self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -textPadding.y))
+                    self.addConstraint(NSLayoutConstraint(item: image!, attribute: .left, relatedBy: .equal, toItem: buttonView!, attribute: .left, multiplier: 1, constant: textPadding.x))
+                    self.addConstraint(NSLayoutConstraint(item: image!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -textPadding.y))
                 case .backspace, .newLine, .keyboardType(.symbolic), .moveCursorForward, .moveCursorBackward:
-                    self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: -8))
-                    self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -6))
+                    self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .right, relatedBy: .equal, toItem: buttonView!, attribute: .right, multiplier: 1, constant: -textPadding.x))
+                    self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .bottom, relatedBy: .equal, toItem: buttonView!, attribute: .bottom, multiplier: 1, constant: -textPadding.y))
                 default:
                     self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .centerX, relatedBy: .equal, toItem: buttonView! , attribute: .centerX, multiplier: 1, constant: 0))
                     self.addConstraint(NSLayoutConstraint(item: textLabel!, attribute: .centerY, relatedBy: .equal, toItem: buttonView!, attribute: .centerY, multiplier: 1, constant: -2))
@@ -322,9 +340,7 @@ class DemoButton: KeyboardButtonView {
         }
     }
     
-    @IBOutlet weak var buttonView: UIView? {
-        didSet { buttonView?.layer.cornerRadius = UIDevice.current.userInterfaceIdiom == .pad ? 8 : 5 }
-    }
+    @IBOutlet weak var buttonView: UIView?
     
     @IBOutlet weak var image: UIImageView?
     
@@ -393,20 +409,32 @@ private extension KeyboardAction {
         return asset.color
     }
     
-    var buttonImage: UIImage? {
+    func buttonImage(in viewController: KeyboardInputViewController) -> UIImage? {
         switch self {
         case .image(_, let imageName, _): return UIImage(named: imageName)
         case .nextKeyboard:
-            return Asset.Images.Buttons.switchKeyboard.image.tinted(with: .white, blendMode: .lighten)?.resized(to: CGSize(width: 24.0, height: 24.0))
+            let dark = useDarkAppearance(in: viewController)
+            if dark {
+                return Asset.Images.Buttons.switchKeyboard.image.tinted(with: ColorAsset(name: "darkSystemButtonText").color, blendMode: .normal)?.resized(to: CGSize(width: 24.0, height: 24.0))
+            } else {
+                return Asset.Images.Buttons.switchKeyboard.image.tinted(with: ColorAsset(name: "lightSystemButtonText").color, blendMode: .normal)?.resized(to: CGSize(width: 24.0, height: 24.0))
+            }
         default: return nil
         }
     }
     
     func buttonFont(in viewController: KeyboardInputViewController) -> UIFont {
         if UIDevice.current.userInterfaceIdiom == .pad {
-            switch self {
-                case .character(_): return UIFont.systemFont(ofSize: 32.0, weight: UIFont.Weight.light)
-                default: return UIFont.systemFont(ofSize: 20.0, weight: UIFont.Weight.regular)
+            if viewController.deviceOrientation.isLandscape {
+                switch self {
+                    case .character(_): return UIFont.systemFont(ofSize: 32.0, weight: UIFont.Weight.light)
+                    default: return UIFont.systemFont(ofSize: 20.0, weight: UIFont.Weight.regular)
+                }
+            } else {
+                switch self {
+                    case .character(_): return UIFont.systemFont(ofSize: 25.0, weight: UIFont.Weight.light)
+                    default: return UIFont.systemFont(ofSize: 15.0, weight: UIFont.Weight.regular)
+                }
             }
         } else {
             switch self {
@@ -438,6 +466,10 @@ private extension KeyboardAction {
                     return UIDevice.current.userInterfaceIdiom == .pad ? "return" : "⏎"
                 case .emergencyCall:
                     return UIDevice.current.userInterfaceIdiom == .pad ? "call" : "⏎"
+                case .search:
+                    return UIDevice.current.userInterfaceIdiom == .pad ? "search" : "⏎"
+                case .send:
+                    return UIDevice.current.userInterfaceIdiom == .pad ? "send" : "⏎"
                 case .go:
                     return "go"
                 default:
