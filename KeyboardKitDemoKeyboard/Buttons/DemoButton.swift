@@ -30,11 +30,13 @@ class DemoButton: KeyboardButtonView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        let dark = action.useDarkAppearance(in: vC!)
-        if dark {
-            buttonView?.applyShadowExtra(.standardExtraButtonShadowDark)
-        } else {
-            buttonView?.applyShadowExtra(.standardExtraButtonShadowLight)
+        if action != .none {
+            let dark = action.useDarkAppearance(in: vC!)
+            if dark {
+                buttonView?.applyShadowExtra(.standardExtraButtonShadowDark)
+            } else {
+                buttonView?.applyShadowExtra(.standardExtraButtonShadowLight)
+            }
         }
     }
     
@@ -63,6 +65,8 @@ class DemoButton: KeyboardButtonView {
         textLabel?.font = action.buttonFont(in: viewController)
         textLabel?.text = action.buttonText(in: viewController)
         switch action {
+            case .none:
+                break
             case .character(let text):
                 if text.rangeOfCharacter(from: CharacterSet.lowercaseLetters.inverted) == nil {
                     character = text.first
@@ -156,7 +160,9 @@ class DemoButton: KeyboardButtonView {
     }
     
     @objc func handleBegin(touch: UITouch) {
-    
+        if action == .none {
+            return
+        }
         lastTouch = touch
         let handler = vC?.context.actionHandler
         currentLocation = touch.location(in: self)
@@ -365,6 +371,8 @@ private extension KeyboardAction {
             ? (dark ? Asset.Colors.darkSystemButton : Asset.Colors.lightSystemButton)
             : (dark ? Asset.Colors.darkButton : Asset.Colors.lightButton)
         switch self {
+            case .none:
+                return .clear
             case .shift(currentState: .uppercased):
                 return ColorAsset(name: "darkSystemButtonActive").color
             case .newLine:
@@ -527,7 +535,7 @@ private extension KeyboardAction {
     
     var buttonWidth: CGFloat {
         switch self {
-        case .none: return 10
+        case .none: return 50
 //        case .backspace: return 100
         case .moveCursorForward, .moveCursorBackward: return 25
 //        case .character("e"): return 60

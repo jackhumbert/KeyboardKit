@@ -49,7 +49,7 @@ class SymbolicKeyboard: DemoKeyboard {
     
         if UIDevice.current.userInterfaceIdiom == .pad {
         return [
-            [KeyboardAction.tab, "-", "<", "$", ">", "@", "`", "[", "_", "]", ";", KeyboardAction.backspace],
+            [KeyboardAction.tab, KeyboardAction.none, "<", "$", ">", "@", "`", "[", "_", "]", ";", KeyboardAction.backspace],
             ["-", "\\", "(", "\"", ")", "#", "%", "{", "=", "}", "|", "'"],
             [KeyboardAction.escape, ";", ":", "*", "+", "/", ".", "&", "^", "~", "?", KeyboardAction.newLine]
         ]
@@ -57,7 +57,7 @@ class SymbolicKeyboard: DemoKeyboard {
         return [
             ["-", "<", "$", ">", "@", "`", "[", "_", "]", KeyboardAction.backspace],
             ["\\", "(", "\"", ")", "#", "%", "{", "=", "}", "|"],
-            [";", ":", "*", "+", "/", ".", "&", "^", "~", "?"]
+            [";", ":", "*", "+", "/", ".", "&", "^", "~", KeyboardAction.none]
         ]
         }
     
