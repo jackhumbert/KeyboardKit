@@ -75,6 +75,7 @@ open class MultitouchGestureRecognizer: UIGestureRecognizer {
     
     /// The currently tracked collection of touches. May contain touches after they have ended, if `sustain` is set to `true`.
     public lazy private(set) var touches = [UITouch]()
+//    public lazy private(set) var initialPoints = [CGPoint]()
     
     /// The current gesture recognizer state, as it pertains to the `sustain` setting.
     public enum MultitouchState {
@@ -119,7 +120,6 @@ open class MultitouchGestureRecognizer: UIGestureRecognizer {
     
     open override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
         super.touchesMoved(touches, with: event)
-        
         update(touches)
     }
     
@@ -176,6 +176,7 @@ open class MultitouchGestureRecognizer: UIGestureRecognizer {
         }
     
         touches.append(touch)
+//        initialPoints.append(touch.location(in: (delegate as! UIViewController).view))
         multitouchDelegate?.multitouchGestureRecognizer?(self, touchDidBegin: touch)
     }
     

@@ -269,9 +269,7 @@ class DemoButton: KeyboardButtonView {
                 (handler as? DemoKeyboardActionHandler)?.triggerAudioFeedback(for: .longPress, on: action, sender: self)
                 (handler as? DemoKeyboardActionHandler)?.triggerHapticFeedback(for: .longPress, on: action, sender: self)
                 touching = false
-//                    gesture.state = .ended
-                gR?.isEnabled = false
-                gR?.isEnabled = true
+                handleEnd(touch: touch)
             }
         }
     }

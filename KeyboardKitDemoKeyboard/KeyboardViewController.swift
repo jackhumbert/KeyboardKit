@@ -181,7 +181,7 @@ class KeyboardViewController: KeyboardInputViewController {
 extension KeyboardViewController: MultitouchGestureRecognizerDelegate {
 
     func multitouchGestureRecognizer(_ gestureRecognizer: MultitouchGestureRecognizer, touchDidBegin touch: UITouch) {
-        let currentLocation = touch.location(in: view)
+        let currentLocation = touch.preciseLocation(in: view)
         var closestButton: DemoButton?
         var closestDistance: CGFloat = 10000
         for v in view.subviews {
