@@ -13,13 +13,14 @@ class KeyboardKey {
     var action: KeyboardAction = .none
     var secondaryAction: KeyboardAction = .none
     var width: Float = 50
+    var system: Bool = false
     
-    init(action: KeyboardAction, width: Float = 50) {
+    init(action: KeyboardAction, width: Float = 50, system: Bool = false) {
         self.action = action
         self.width = width
     }
     
-    convenience init(action: String, width: Float = 50) {
-        self.init(action: .character(action), width: width)
+    convenience init(action: String, width: Float = 50, system: Bool = false) {
+        self.init(action: .character(action), width: width, system: system)
     }
 }
