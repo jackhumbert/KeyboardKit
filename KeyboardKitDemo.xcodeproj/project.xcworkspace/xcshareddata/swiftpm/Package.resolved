@@ -14,9 +14,9 @@
         "package": "KeyboardKitSwiftUI",
         "repositoryURL": "https://github.com/danielsaidi/KeyboardKitSwiftUI",
         "state": {
-          "branch": null,
-          "revision": "5d367f87e9ac8d72b44325bf5cd8f581982be610",
-          "version": "3.0.1"
+          "branch": null,"
+          "revision": "a605086d478697e788ded3744da0b4ea400ef16a",
+          "version": "3.0.3"
         }
       }
     ]
